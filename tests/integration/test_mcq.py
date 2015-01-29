@@ -45,6 +45,9 @@ class MCQBlockTest(MentoringBaseTest):
         """
         mcq_legend.click()
 
+    def _get_labels(self, choices):
+        return [choice.find_element_by_css_selector('label') for choice in choices]
+
     def _get_inputs(self, choices):
         return [choice.find_element_by_css_selector('input') for choice in choices]
 
@@ -71,20 +74,24 @@ class MCQBlockTest(MentoringBaseTest):
         self.assertEqual(mcq1_legend.text, 'QUESTION 1\nDo you like this MCQ?')
         self.assertEqual(mcq2_legend.text, 'QUESTION 2\nHow much do you rate this MCQ?')
 
-        mcq1_choices = mcq1.find_elements_by_css_selector('.choices .choice label')
-        mcq2_choices = mcq2.find_elements_by_css_selector('.rating .choice label')
+        mcq1_choices = mcq1.find_elements_by_css_selector('.choices .choice')
+        mcq2_choices = mcq2.find_elements_by_css_selector('.rating .choice')
 
         self.assertEqual(len(mcq1_choices), 3)
         self.assertEqual(len(mcq2_choices), 6)
-        self.assertEqual(mcq1_choices[0].text, 'Yes')
-        self.assertEqual(mcq1_choices[1].text, 'Maybe not')
-        self.assertEqual(mcq1_choices[2].text, "I don't understand")
-        self.assertEqual(mcq2_choices[0].text, '1')
-        self.assertEqual(mcq2_choices[1].text, '2')
-        self.assertEqual(mcq2_choices[2].text, '3')
-        self.assertEqual(mcq2_choices[3].text, '4')
-        self.assertEqual(mcq2_choices[4].text, '5')
-        self.assertEqual(mcq2_choices[5].text, "I don't want to rate it")
+
+        mcq1_choices_label = self._get_labels(mcq1_choices)
+        mcq2_choices_label = self._get_labels(mcq2_choices)
+
+        self.assertEqual(mcq1_choices_label[0].text, 'Yes')
+        self.assertEqual(mcq1_choices_label[1].text, 'Maybe not')
+        self.assertEqual(mcq1_choices_label[2].text, "I don't understand")
+        self.assertEqual(mcq2_choices_label[0].text, '1 - Not good at all')
+        self.assertEqual(mcq2_choices_label[1].text, '2')
+        self.assertEqual(mcq2_choices_label[2].text, '3')
+        self.assertEqual(mcq2_choices_label[3].text, '4')
+        self.assertEqual(mcq2_choices_label[4].text, '5 - Extremely good')
+        self.assertEqual(mcq2_choices_label[5].text, "I don't want to rate it")
 
         mcq1_choices_input = self._get_inputs(mcq1_choices)
         mcq2_choices_input = self._get_inputs(mcq2_choices)
@@ -146,13 +153,16 @@ class MCQBlockTest(MentoringBaseTest):
         mcq_legend = mcq.find_element_by_css_selector('legend')
         self.assertEqual(mcq_legend.text, 'QUESTION\nWhat do you like in this MRQ?')
 
-        mcq_choices = mcq.find_elements_by_css_selector('.choices .choice label')
+        mcq_choices = mcq.find_elements_by_css_selector('.choices .choice')
 
         self.assertEqual(len(mcq_choices), 4)
-        self.assertEqual(mcq_choices[0].text, 'Its elegance')
-        self.assertEqual(mcq_choices[1].text, 'Its beauty')
-        self.assertEqual(mcq_choices[2].text, "Its gracefulness")
-        self.assertEqual(mcq_choices[3].text, "Its bugs")
+
+        mcq_choices_label = self._get_labels(mcq_choices)
+
+        self.assertEqual(mcq_choices_label[0].text, 'Its elegance')
+        self.assertEqual(mcq_choices_label[1].text, 'Its beauty')
+        self.assertEqual(mcq_choices_label[2].text, "Its gracefulness")
+        self.assertEqual(mcq_choices_label[3].text, "Its bugs")
 
         mcq_choices_input = self._get_inputs(mcq_choices)
         self.assertEqual(mcq_choices_input[0].get_attribute('value'), 'elegance')
@@ -174,7 +184,7 @@ class MCQBlockTest(MentoringBaseTest):
 
         for index, expected_feedback in enumerate(item_feedbacks):
             choice_wrapper = choices_list.find_elements_by_css_selector(".choice")[index]
-            choice_wrapper.find_element_by_css_selector(".choice-selector").click()  # clicking on actual radio button
+            choice_wrapper.find_element_by_css_selector(".choice-selector input").click()  # clicking on actual radio button
             submit.click()
             item_feedback_icon = choice_wrapper.find_element_by_css_selector(".choice-result")
             choice_wrapper.click()
@@ -223,7 +233,7 @@ class MCQBlockTest(MentoringBaseTest):
         submit = mentoring.find_element_by_css_selector('.submit input.input-main')
         self.assertFalse(submit.is_enabled())
 
-        inputs = choices_list.find_elements_by_css_selector('input.choice-selector')
+        inputs = choices_list.find_elements_by_css_selector('.choice-selector input')
         self._selenium_bug_workaround_scroll_to(choices_list)
         inputs[0].click()
         inputs[1].click()
