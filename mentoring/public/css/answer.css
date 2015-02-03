@@ -5,7 +5,9 @@
 }
 
 .mentoring .answer-checkmark {
-    display: inline-block;
+    display: block;
+    float: none;
+    width: 40px;
     margin-bottom: 20px;
 }
 

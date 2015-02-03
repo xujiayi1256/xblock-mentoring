@@ -508,26 +508,6 @@ $ ./manage.py runserver 8000 --settings=workbench.settings_mentoring
 
 Access it at [http://localhost:8000/](http://localhost:8000).
 
-Running tests
--------------
-
-From the xblock-mentoring repository root, run the tests with the
-following command:
-
-```bash
-$ DJANGO_SETTINGS_MODULE="workbench.settings_mentoring" nosetests --with-django
-```
-
-If you want to run only the integration or the unit tests, append the directory to the command. You can also run separate modules in this manner.
-
-```bash
-$ DJANGO_SETTINGS_MODULE="workbench.settings_mentoring" nosetests --with-django tests/unit
-```
-
-If you have not installed the xblock-sdk in the active virtualenv,
-you might also have to prepend `PYTHONPATH=".:/path/to/xblock"` to the command above.
-(`/path/to/xblock` is the path to the xblock-sdk, where the workbench resides).
-
 Adding custom scenarios to the workbench
 ----------------------------------------
 
@@ -548,6 +528,28 @@ you will also have to purge and rebuild the database:
 ```bash
 rm workbench.sqlite
 ./manage.py syncdb --settings=workbench.settings_mentoring <<<"no"
+```
+
+Testing
+-------
+
+Inside a fresh virtual environment run:
+
+```bash
+$ cd .../xblock-mentoring/
+$ pip install -r tests/requirements.txt
+```
+
+Then create the required database tables with:
+
+```bash
+$ tests/manage.py syncdb --noinput
+```
+
+Then run the tests from the xblock-mentoring repository root with:
+
+```bash
+$ tests/manage.py test --rednose
 ```
 
 License

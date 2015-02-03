@@ -24,6 +24,8 @@
 # Imports ###########################################################
 
 import logging
+import uuid
+from lazy import lazy
 
 from xblock.fragment import Fragment
 
@@ -126,3 +128,12 @@ class QuestionnaireAbstractBlock(LightChild, StepMixin):
             if choice.value == submission:
                 return choice.content
         return submission
+
+    @lazy
+    def uuid(self):
+        """
+        Returns a UUID that remains constant through the lifetime
+        of the object.
+        Used in views to ensure id attribute uniqueness.
+        """
+        return uuid.uuid4().hex

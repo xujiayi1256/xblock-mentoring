@@ -1,6 +1,6 @@
 *~
 *.pyc
+*.sqlite
 /xblock_mentoring.egg-info
-/workbench.sqlite
 /dist
 /templates
