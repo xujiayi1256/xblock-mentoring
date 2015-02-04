@@ -97,7 +97,8 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
                       default='mentoring-default', scope=Scope.content)
     enforce_dependency = Boolean(help="Should the next step be the current block to complete?",
                                  default=False, scope=Scope.content, enforce_type=True)
-    display_submit = Boolean(help="Allow to submit current block?", default=True, scope=Scope.content)
+    display_submit = Boolean(help="Allow submission of the current block?", default=True,
+                             scope=Scope.content, enforce_type=True)
     xml_content = String(help="XML content", default=_default_xml_content, scope=Scope.content)
     weight = Float(help="Defines the maximum total grade of the block.",
                    default=1, scope=Scope.content, enforce_type=True)
@@ -171,6 +172,9 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         fragment.add_resource(loader.load_unicode('templates/html/mentoring_grade.html'), "text/html")
 
         fragment.initialize_js('MentoringBlock')
+
+        if not self.display_submit:
+            self.runtime.publish(self, 'progress', {})
 
         return fragment
 
