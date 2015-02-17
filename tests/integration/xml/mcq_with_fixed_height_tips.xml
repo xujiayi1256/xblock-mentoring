@@ -1,0 +1,14 @@
+<vertical_demo>
+    <mentoring url_name="mcq_1" enforce_dependency="false">
+        <mcq name="mcq_1_1" type="choices">
+            <question>Do you like this MCQ?</question>
+            <choice value="yes">Yes</choice>
+            <choice value="maybenot">Maybe not</choice>
+            <choice value="understand">I don't understand</choice>
+
+            <tip display="yes" height="10">Great!</tip> <!--should be no less than 40 -->
+            <tip reject="maybenot" height="60">Ah, damn.</tip>
+            <tip reject="understand" height="600">Really?</tip> <!-- should override max-height -->
+        </mcq>
+    </mentoring>
+</vertical_demo>

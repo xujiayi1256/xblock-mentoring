@@ -24,6 +24,7 @@ function MessageView(element, mentoring) {
 
             if (data && data.height) {
                 popupDOM.css('height', data.height);
+                popupDOM.css('maxHeight', data.height);
             } else {
                 popupDOM.css('height', '');
             }
