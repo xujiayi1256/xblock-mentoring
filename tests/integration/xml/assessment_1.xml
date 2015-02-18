@@ -43,4 +43,8 @@
         <tip require="elegance,beauty">This is something everyone has to like about this MRQ</tip>
         <tip reject="bugs">Nah, there isn't any!</tip>
     </mrq>
+
+    <message type="on-assessment-review">
+        <html>Assessment additional feedback message text</html>
+    </message>
 </mentoring>
