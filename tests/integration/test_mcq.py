@@ -244,3 +244,35 @@ class MCQBlockTest(MentoringBaseTest):
         self.wait_until_disabled(submit)
 
         self.assertIn('Congratulations!', messages.text)
+
+    def _get_inner_height(self, elem):
+        return elem.size['height'] - \
+            int(elem.value_of_css_property("padding-top").replace(u'px', u'')) - \
+            int(elem.value_of_css_property("padding-bottom").replace(u'px', u''))
+
+    @ddt.unpack
+    @ddt.data(
+        ('yes', 40),
+        ('maybenot', 60),
+        ('understand', 600)
+    )
+    def test_tip_height(self, choice_value, expected_height):
+        mentoring = self.go_to_page("Mcq With Fixed Height Tips")
+        choices_list = mentoring.find_element_by_css_selector(".choices-list")
+        submit = mentoring.find_element_by_css_selector('.submit input.input-main')
+        feedback = choices_list.find_element_by_css_selector(".feedback")
+
+        choice_input_css_selector = ".choice .choice-selector input[value={}]".format(choice_value)
+        choice_input = choices_list.find_element_by_css_selector(choice_input_css_selector)
+        choice_wrapper = choice_input.find_element_by_xpath("./ancestor::div[@class='choice']")
+
+        choice_input.click()
+        self.wait_until_clickable(submit)
+        submit.click()
+        self.wait_until_visible(feedback)
+        feedback_height = self._get_inner_height(feedback)
+        self.assertEqual(feedback_height, expected_height)
+
+        choice_wrapper.find_element_by_css_selector(".choice-result").click()
+        item_feedback_height = self._get_inner_height(choice_wrapper.find_element_by_css_selector(".choice-tips"))
+        self.assertEqual(item_feedback_height, expected_height)

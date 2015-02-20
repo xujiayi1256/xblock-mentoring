@@ -130,6 +130,9 @@
     margin: 0;
 }
 
-.mentoring .feedback {
+.mentoring .feedback,
+.mentoring .choice-tips {
+    min-height: 40px;
     max-height: 100%;
+    z-index: 10000;
 }

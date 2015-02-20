@@ -22,8 +22,13 @@
 #
 
 from xblockutils.base_test import SeleniumBaseTest
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class MentoringBaseTest(SeleniumBaseTest):
     module_name = __name__
     default_css_selector = 'div.mentoring'
+
+    def wait_until_visible(self, elem):
+        wait = WebDriverWait(elem, self.timeout)
+        wait.until(lambda e: e.is_displayed(), u"{} should be hidden".format(elem.text))
