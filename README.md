@@ -143,6 +143,8 @@ answer element supports the following attributes:
   only makes sense when displaying an answer to a previously answered
   question. The answer is rendered as a HTML quote instead of a
   textarea element (boolean; defaults to `false`).
+* `show_title` - Whether to display the title (QUESTION num) above the
+  question (boolean; defaults to `true`).
 
 It can also have a `<question>` element containing a paragraph of non-formatted plain text.
 
@@ -198,6 +200,8 @@ Multiple choice questions are represented by the `<mcq>` element. The
   questions of the `rating` type (string; defaults to `"Less"`).
 * `high` - Sets the label of the lowest value. Only makes sense for
   questions of the `rating` type (string; defaults to `"More"`).
+* `show_title` - Whether to display the title (QUESTION num) above the
+  question (boolean; defaults to `true`).
 
 The `<mcq>` element can contain the following child elements:
 
@@ -287,6 +291,8 @@ The `<mrq>` element supports these attributes:
   question will have on the grade. Value of zero means this question
   has no influence on the grade (float, defaults to `1`).
 * `hide_results` - If set to `true`, the feedback icons next to each
+* `show_title` - Whether to display the title (QUESTION num) above the
+  question (boolean; defaults to `true`).
   choice will not be displayed (boolean; defaults to `false`).
 
 The `<question>` and `<choice>` elements work the same way as they

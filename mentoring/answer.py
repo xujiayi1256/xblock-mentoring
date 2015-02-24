@@ -49,6 +49,7 @@ class AnswerBlock(LightChild, StepMixin):
     Must be included as a child of a mentoring block. Answers are persisted as django model instances
     to make them searchable and referenceable across xblocks.
     """
+    show_title = Boolean(help="Display the default title (QUESTION)?", default=True, scope=Scope.content)
     read_only = Boolean(help="Display as a read-only field", default=False, scope=Scope.content)
     default_from = String(help="If specified, the name of the answer to get the default value from",
                           default=None, scope=Scope.content)
