@@ -170,6 +170,16 @@ class MCQBlockTest(MentoringBaseTest):
         self.assertEqual(mcq_choices_input[2].get_attribute('value'), 'gracefulness')
         self.assertEqual(mcq_choices_input[3].get_attribute('value'), 'bugs')
 
+    @ddt.data(
+        'Mcq Without Title',
+        'Mcq Rating Without Title',
+        'Mrq Without Title'
+    )
+    def test_mcq_without_title(self, page):
+        mentoring = self.go_to_page(page)
+        mcq_legend = mentoring.find_element_by_css_selector('fieldset legend')
+        self.assertNotIn('QUESTION', mcq_legend.text)
+
     def test_mcq_feedback_popups(self):
         mentoring = self.go_to_page('Mcq With Comments 1')
         choices_list = mentoring.find_element_by_css_selector(".choices-list")

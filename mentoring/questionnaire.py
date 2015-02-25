@@ -31,7 +31,7 @@ from xblock.fragment import Fragment
 
 from .choice import ChoiceBlock
 from .step import StepMixin
-from .light_children import LightChild, Scope, String, Float
+from .light_children import LightChild, Scope, String, Float, Boolean
 from .tip import TipBlock
 from .utils import loader, ContextConstants
 
@@ -52,6 +52,7 @@ class QuestionnaireAbstractBlock(LightChild, StepMixin):
     set, with preset choices and author-defined values.
     """
     type = String(help="Type of questionnaire", scope=Scope.content, default="choices")
+    show_title = Boolean(help="Display the default title (QUESTION)?", default=True, scope=Scope.content)
     question = String(help="Question to ask the student", scope=Scope.content, default="")
     message = String(help="General feedback provided when submiting", scope=Scope.content, default="")
     weight = Float(help="Defines the maximum total grade of the light child block.",
