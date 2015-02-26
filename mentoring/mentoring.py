@@ -141,6 +141,13 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
 
         return Score(score, int(round(score * 100)), correct, incorrect, partially_correct)
 
+    @property
+    def assessment_message(self):
+        if not self.max_attempts_reached:
+            return self.get_message_html('on-assessment-review')
+        else:
+            return None
+
     def student_view(self, context):
         # Migrate stored data if necessary
         self.migrate_fields()
@@ -158,14 +165,9 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         fragment.add_css_url(self.runtime.local_resource_url(self, 'public/css/mentoring.css'))
         fragment.add_javascript_url(
             self.runtime.local_resource_url(self, 'public/js/vendor/underscore-min.js'))
-        if self.is_assessment:
-            fragment.add_javascript_url(
-                self.runtime.local_resource_url(self, 'public/js/mentoring_assessment_view.js')
-            )
-        else:
-            fragment.add_javascript_url(
-                self.runtime.local_resource_url(self, 'public/js/mentoring_standard_view.js')
-            )
+
+        js_view = 'mentoring_assessment_view.js' if self.is_assessment else 'mentoring_standard_view.js'
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/'+js_view))
 
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/mentoring.js'))
         fragment.add_resource(loader.load_unicode('templates/html/mentoring_attempts.html'), "text/html")
@@ -313,6 +315,8 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         children = [child for child in self.get_children_objects()
                     if not isinstance(child, self.FLOATING_BLOCKS)]
 
+        message = None
+
         for child in children:
             if child.name and child.name in submissions:
                 submission = submissions[child.name]
@@ -348,6 +352,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
                     'score_type': 'proficiency',
                 })
                 event_data['final_grade'] = score.raw
+                message = self.assessment_message
 
             self.num_attempts += 1
             self.completed = True
@@ -368,6 +373,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
             'correct_answer': score.correct,
             'incorrect_answer': score.incorrect,
             'partially_correct_answer': score.partially_correct,
+            'message': message
         }
 
     @XBlock.json_handler

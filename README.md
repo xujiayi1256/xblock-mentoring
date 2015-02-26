@@ -89,8 +89,9 @@ elements:
 * `<mrq>` - Multiple response question, rendered as checkboxes.
 * `<mentoring-table>` - Displays answers to free-form questions in a
   HTML table.
-* `<message>` - Declares feedback text that is displayed when the
-  student submits an answer (ignored in `assessment` mode).
+* `<message>` - Declares feedback text that is displayed
+    * `type='on-submit'` - when the student submits an answer; ignored in `assessment` mode
+    * `type='on-assessment-review'` - when the student reviews assessment results; ignored in `standard` mode
 
 ### Mentoring modes
 
