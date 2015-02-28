@@ -26,7 +26,7 @@
 import logging
 
 from .light_children import LightChild, Scope, String
-from .utils import loader
+from .utils import loader, ContextConstants
 
 
 # Globals ###########################################################
@@ -64,7 +64,7 @@ class TipBlock(LightChild):
         """
         Returns a fragment containing the formatted tip
         """
-        fragment, named_children = self.get_children_fragment({})
+        fragment, named_children = self.get_children_fragment({ContextConstants.AS_TEMPLATE: False})
         fragment.add_content(loader.render_template('templates/html/tip.html', {
             'self': self,
             'named_children': named_children,

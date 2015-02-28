@@ -562,5 +562,5 @@ $ tests/manage.py test --rednose
 License
 -------
 
-The Image Explorer XBlock is available under the GNU Affero General
+The Mentoring XBlock is available under the GNU Affero General
 Public License (AGPLv3).

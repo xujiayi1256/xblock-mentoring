@@ -18,8 +18,10 @@ function MessageView(element, mentoring) {
             var data = $(tip).data();
             if (data && data.width) {
                 popupDOM.css('width', data.width);
+                popupDOM.find('.tip-choice-group').css('width', data.width);
             } else {
                 popupDOM.css('width', '');
+                popupDOM.find('.tip-choice-group').css('width', '');
             }
 
             if (data && data.height) {
@@ -27,7 +29,11 @@ function MessageView(element, mentoring) {
                 popupDOM.css('maxHeight', data.height);
             } else {
                 popupDOM.css('height', '');
+                popupDOM.css('maxHeight', '');
             }
+            // .tip-choice-group should always be the same height as the popup
+            // for scrolling to work properly.
+            popupDOM.find('.tip-choice-group').height(popupDOM.height());
 
             popupDOM.show();
 
