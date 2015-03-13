@@ -17,9 +17,11 @@ function AnswerBlock(runtime, element) {
             return $(':input', element).serializeArray();
         },
 
+        handleReview: function(result) {
+            $('textarea', element).prop('disabled', true);
+        },
+
         handleSubmit: function(result) {
-            if (this.mode === 'assessment')
-                return;
 
             var checkmark = $('.answer-checkmark', element);
             $(element).find('.message').text((result || {}).error || '');

@@ -3,6 +3,7 @@ DEBUG = True
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.admin',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',

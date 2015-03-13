@@ -45,11 +45,19 @@ class MRQBlock(QuestionnaireAbstractBlock):
     student_choices = List(help="Last submissions by the student", default=[], scope=Scope.user_state)
     hide_results = Boolean(help="Hide results", scope=Scope.content, default=False)
 
-    def submit(self, submissions):
-        log.debug(u'Received MRQ submissions: "%s"', submissions)
+    def get_results(self, previous_result):
+        """
+        Get the results a student has already submitted.
+        """
+        result = self.calculate_results(previous_result['submissions'])
+        result['completed'] = True
+        return result
 
+    def calculate_results(self, submissions):
+        """
+        Tally choices based upon a set of submissions.
+        """
         score = 0
-
         results = []
         for choice in self.custom_choices:
             choice_completed = True
@@ -77,11 +85,9 @@ class MRQBlock(QuestionnaireAbstractBlock):
                     'self': self,
                     'tips_fragments': choice_tips_fragments,
                     'completed': choice_completed,
-                })
+                    })
 
             results.append(choice_result)
-
-        self.student_choices = submissions
 
         status = 'incorrect' if score <= 0 else 'correct' if score >= len(results) else 'partial'
 
@@ -93,6 +99,14 @@ class MRQBlock(QuestionnaireAbstractBlock):
             'weight': self.weight,
             'score': float(score) / len(results),
         }
+
+        return result
+
+    def submit(self, submissions):
+        log.debug(u'Received MRQ submissions: "%s"', submissions)
+
+        result = self.calculate_results(submissions)
+        self.student_choices = submissions
 
         log.debug(u'MRQ submissions result: %s', result)
         return result

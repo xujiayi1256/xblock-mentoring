@@ -136,3 +136,10 @@
     max-height: 100%;
     z-index: 10000;
 }
+
+.mentoring .review-list {
+    list-style: none;
+}
+.mentoring .review-list li {
+    display: inline;
+}

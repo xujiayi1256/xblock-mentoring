@@ -160,8 +160,8 @@ class LightChildrenMixin(XBlockWithChildrenFragmentsMixin):
         """
 
         frag = getattr(child, view_name)(context)
-        frag.content = u'<div class="xblock-light-child" name="{}" data-type="{}">{}</div>'.format(
-            child.name, child.__class__.__name__, frag.content)
+        frag.content = u'<div class="xblock-light-child" name="{}" data-type="{}" data-step="{}">{}</div>'.format(
+            child.name, child.__class__.__name__, getattr(child, 'step_number', ''), frag.content)
         return frag
 
     def get_children_fragment(self, context, view_name='student_view', instance_of=None,
