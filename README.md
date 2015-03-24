@@ -444,9 +444,10 @@ After submitting a wrong answer two times:
 
 ### Extended Feedback
 
-For a more detailed feedback, the mentoring tag can have the attribute `extended-feedback="true"`.
+For a more detailed feedback, the mentoring tag can have the attribute `extended_feedback="true"`.
 This will give the user a laid out list of the questions they have answered, and whether or not
-their answers were correct, allowing them to review each.
+their answers were correct, allowing them to review each. Extended feedback only works with
+assessment mode.
 
 ![Extended Review](doc/img/extended-review.png)
 
