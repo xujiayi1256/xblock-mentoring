@@ -29,7 +29,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
 
     function renderGrade() {
         var data = $('.grade', element).data();
-        data['enable_extended'] = (no_more_attempts() && data['extended_feedback']);
+        data.enable_extended = (no_more_attempts() && data.extended_feedback);
         cleanAll();
         $('.grade', element).html(gradeTemplate(data));
         reviewDOM.hide();
@@ -50,10 +50,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
             mentoring.setContent(messagesDOM, data.assessment_message);
             messagesDOM.show();
         }
-        $('a.question-link', element).each(function (){
-            var link = $(this);
-            link.bind('click', jumpToName)
-        });
+        $('a.question-link', element).click(jumpToName);
     }
 
     function handleTryAgain(result) {
@@ -150,18 +147,20 @@ function MentoringAssessmentView(runtime, element, mentoring) {
             ++active_child;
         }
 
-        if (isDone())
+        if (isDone()) {
             renderGrade();
-        post_display()
+        } else {
+            post_display();
+        }
     }
 
     function post_display(results) {
         nextDOM.attr('disabled', 'disabled');
-        if (! no_more_attempts()) {
-            reviewDOM.attr('disabled', 'disabled');
-        } else {
+        if (no_more_attempts()) {
             reviewDOM.show();
             reviewDOM.removeAttr('disabled')
+        } else {
+            reviewDOM.attr('disabled', 'disabled');
         }
         validateXBlock();
     }
@@ -199,7 +198,6 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         /* Something went wrong with student submission, denied next question */
         if (response.step != active_child+1) {
             active_child = response.step-1;
-            // displayNextChild();
         }
         else {
             nextDOM.removeAttr("disabled");
