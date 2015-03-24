@@ -8,7 +8,7 @@
   <hr/>
   <% var q, last_question; %>
   <span class="assessment-checkmark icon-2x checkmark-correct icon-ok fa fa-check"></span>
-  <p>You answered <%= correct_answer %> questions correctly<% if (enable_extended && correct.length) {{ %>:<% }} else {{ %>.<% }} %></p>
+  <div class="results-section"><p>You answered <%= correct_answer %> questions correctly<% if (enable_extended && correct.length) {{ %>:<% }} else {{ %>.<% }} %></p>
     <% if (enable_extended) {{ var questions = correct; %>
         <ul class="review-list correct-list">
            <% for (var question in questions) {{ q = questions[question]; last_question = question == questions.length - 1; %>
@@ -16,8 +16,10 @@
             <% }} %>
         </ul>
     <% }} %>
+  </div>
+  <div class="clear"></div>
   <span class="assessment-checkmark icon-2x checkmark-partially-correct icon-ok fa fa-check"></span>
-  <p>You answered <%= partially_correct_answer %> questions partially correct<% if (enable_extended && partial.length) {{ %>:<% }} else {{ %>.<% }} %></p>
+  <div class="results-section"><p>You answered <%= partially_correct_answer %> questions partially correct<% if (enable_extended && partial.length) {{ %>:<% }} else {{ %>.<% }} %></p>
     <% if (enable_extended) {{ var questions = partial ;%>
         <ul class="review-list partial-list">
             <% for (var question in questions) {{ q = questions[question];%>
@@ -25,8 +27,10 @@
             <% }} %>
         </ul>
     <% }} %>
+  </div>
+  <div class="clear"></div>
   <span class="assessment-checkmark icon-2x checkmark-incorrect icon-exclamation fa fa-exclamation"></span>
-  <p>You answered <%= incorrect_answer %> questions incorrectly<% if (enable_extended && incorrect.length) {{ %>:<% }} else {{ %>.<% }} %></p>
+  <div class="results-section"><p>You answered <%= incorrect_answer %> questions incorrectly<% if (enable_extended && incorrect.length) {{ %>:<% }} else {{ %>.<% }} %></p>
     <% if (enable_extended) {{ var questions = incorrect; %>
         <ul class="review-list incorrect-list">
             <% for (var question in questions) {{ q = questions[question];%>
@@ -34,4 +38,6 @@
             <% }} %>
         </ul>
     <% }} %>
+  </div>
+<div class="clear"></div>
 </script>
