@@ -1,5 +1,6 @@
 function MentoringAssessmentView(runtime, element, mentoring) {
     var gradeTemplate = _.template($('#xblock-grade-template').html());
+    var reviewQuestionsTemplate = _.template($('#xblock-review-questions-template').html());
     var submitDOM, nextDOM, reviewDOM, tryAgainDOM, messagesDOM;
     var submitXHR;
     var checkmark;
@@ -30,6 +31,16 @@ function MentoringAssessmentView(runtime, element, mentoring) {
     function renderGrade() {
         var data = $('.grade', element).data();
         data.enable_extended = (no_more_attempts() && data.extended_feedback);
+        _.extend(data, {
+            'enable_extended': (no_more_attempts() && data.extended_feedback),
+            'runDetails': function(label) {
+                if (! this.enable_extended) {
+                    return '.'
+                }
+                var self = this;
+                return reviewQuestionsTemplate({'questions': self[label], 'label': label})
+            }
+        });
         cleanAll();
         $('.grade', element).html(gradeTemplate(data));
         reviewDOM.hide();
@@ -209,7 +220,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         handleResults(response);
         var options = {
             max_attempts: response.max_attempts,
-            num_attempts: response.num_attempts,
+            num_attempts: response.num_attempts
         };
         var name = response.results[0];
         var result = response.results[1];

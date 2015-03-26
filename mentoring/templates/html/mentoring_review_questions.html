@@ -1,0 +1,8 @@
+<script type="text/template" id="xblock-review-questions-template">:
+    <% var q, last_question; %>
+    <ul class="review-list <%= label %>-list">
+       <% for (var question in questions) {{ q = questions[question]; last_question = question == questions.length - 1; %>
+        <li><% if (last_question && ! (questions.length == 1)) {{ %>and <% }} %><a href="#" class="question-link" data-name="<%= q.id %>">Question <%= q.number %></a><% if (!last_question && ! (questions.length == 2)) {{ %>,<% }} %></li>
+        <% }} %>
+    </ul>
+</script>

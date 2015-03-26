@@ -28,6 +28,11 @@ function AnswerBlock(runtime, element) {
 
             this.clearResult();
 
+            if (this.mode === 'assessment') {
+                // Display of checkmark would be redundant.
+                return
+            }
+
             if (result.status === "correct") {
                 checkmark.addClass('checkmark-correct icon-ok fa-check');
             }

@@ -116,6 +116,12 @@ class AnswerBlock(LightChild, StepMixin):
         fragment.add_css_url(self.runtime.local_resource_url(self.xblock_container, 'public/css/answer_table.css'))
         return fragment
 
+    def submit(self, submission):
+        if not self.read_only:
+            self.student_input = submission[0]['value'].strip()
+            log.info(u'Answer submitted for`{}`: "{}"'.format(self.name, self.student_input))
+        return self.calculate_results()
+
     def get_results(self, previous_result):
         # Previous result is actually stored in database table-- ignore.
         return self.calculate_results()
@@ -127,12 +133,6 @@ class AnswerBlock(LightChild, StepMixin):
             'weight': self.weight,
             'score': 1 if self.status == 'correct' else 0,
         }
-
-    def submit(self, submission):
-        if not self.read_only:
-            self.student_input = submission[0]['value'].strip()
-            log.info(u'Answer submitted for`{}`: "{}"'.format(self.name, self.student_input))
-        return self.calculate_results()
 
     @property
     def status(self):

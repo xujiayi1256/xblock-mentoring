@@ -49,6 +49,14 @@ class MCQBlock(QuestionnaireAbstractBlock):
 
     valid_types = ('rating', 'choices')
 
+    def submit(self, submission):
+        log.debug(u'Received MCQ submission: "%s"', submission)
+        result = self.calculate_results(submission)
+        self.student_choice = submission
+        self.save()
+        log.debug(u'MCQ submission result: %s', result)
+        return result
+
     def get_results(self, previous_result):
         return self.calculate_results(previous_result['submission'])
 
@@ -73,14 +81,6 @@ class MCQBlock(QuestionnaireAbstractBlock):
             'weight': self.weight,
             'score': 1 if correct else 0,
         }
-
-    def submit(self, submission):
-        log.debug(u'Received MCQ submission: "%s"', submission)
-        result = self.calculate_results(submission)
-        self.student_choice = submission
-        self.save()
-        log.debug(u'MCQ submission result: %s', result)
-        return result
 
     def is_tip_correct(self, tip, submission):
         if not submission:
