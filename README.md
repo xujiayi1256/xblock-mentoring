@@ -23,7 +23,7 @@ It supports:
 The screenshot shows an example of a mentoring block containing a
 free-form question, two MCQs and one MRQ.
 
-![Mentoring Example](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/mentoring-example.png)
+![Mentoring Example](doc/img/mentoring-example.png)
 
 Installation
 ------------
@@ -54,7 +54,7 @@ Usage
 When you add the `Mentoring` component to a course in the studio, the
 block is field with default XML content, shown in the screenshot below.
 
-![Edit View](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/edit-view.png)
+![Edit View](doc/img/edit-view.png)
 
 The wrapping `<mentoring>` supports the following attributes:
 
@@ -109,19 +109,19 @@ Below are some LMS screenshots of a mentoring block in assessment mode.
 
 Question before submitting an answer:
 
-![Assessment Step 1](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/assessment-1.png)
+![Assessment Step 1](doc/img/assessment-1.png)
 
 Question after submitting the correct answer:
 
-![Assessment Step 2](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/assessment-2.png)
+![Assessment Step 2](doc/img/assessment-2.png)
 
 Question after submitting a wrong answer:
 
-![Assessment Step 3](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/assessment-3.png)
+![Assessment Step 3](doc/img/assessment-3.png)
 
 Score review and the "Try Again" button:
 
-![Assessment Step 4](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/assessment-4.png)
+![Assessment Step 4](doc/img/assessment-4.png)
 
 ### Free-form questions
 
@@ -163,11 +163,11 @@ Here is a simple example of a free-form question:
 
 Screenshot before answering the question:
 
-![Answer Initial](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/answer-1.png)
+![Answer Initial](doc/img/answer-1.png)
 
 Screenshot after answering the question:
 
-![Answer Complete](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/answer-2.png)
+![Answer Complete](doc/img/answer-2.png)
 
 The second example shows how to display the answer that the student
 submitted in the previous step. The only difference is that the
@@ -184,7 +184,7 @@ submitted in the previous step. The only difference is that the
 
 The read-only answer is rendered as a quote in the LMS:
 
-![Answer Read-Only](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/answer-3.png)
+![Answer Read-Only](doc/img/answer-3.png)
 
 ### Self-assessment MCQs
 
@@ -267,15 +267,15 @@ type.
 
 Before attempting to answer the questions:
 
-![MCQ Initial](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/mcq-1.png)
+![MCQ Initial](doc/img/mcq-1.png)
 
 While attempting to complete the questions:
 
-![MCQ Attempting](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/mcq-2.png)
+![MCQ Attempting](doc/img/mcq-2.png)
 
 After successfully completing the questions:
 
-![MCQ Success](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/mcq-3.png)
+![MCQ Success](doc/img/mcq-3.png)
 
 ### Self-assessment MRQs
 
@@ -330,7 +330,7 @@ demonstrates the effects of setting `hide_results` attribute to
 
         <tip require="gracefulness">This MRQ is indeed very graceful</tip>
         <tip require="elegance,beauty">This is something everyone has to like about this MRQ</tip>
-        <tip reject="bugs">Nah, there isn't any!</tip>
+        <tip reject="bugs">Nah, there aren't any!</tip>
 
         <message type="on-submit">Thank you for answering!</message>
     </mrq>
@@ -344,26 +344,26 @@ demonstrates the effects of setting `hide_results` attribute to
 
         <tip require="gracefulness">This MRQ is indeed very graceful</tip>
         <tip require="elegance,beauty">This is something everyone has to like about this MRQ</tip>
-        <tip reject="bugs">Nah, there isn't any!</tip>
+        <tip reject="bugs">Nah, there aren't any!</tip>
     </mrq>
 </mentoring>
 ```
 
 Before attempting to answer the questions:
 
-![MRQ Initial](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/mrq-1.png)
+![MRQ Initial](doc/img/mrq-1.png)
 
 While attempting to answer the questions:
 
-![MRQ Attempt](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/mrq-2.png)
+![MRQ Attempt](doc/img/mrq-2.png)
 
 After clicking on the feedback icon next to the "Its bugs" answer:
 
-![MRQ Attempt](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/mrq-3.png)
+![MRQ Attempt](doc/img/mrq-3.png)
 
 After successfully completing the questions:
 
-![MRQ Success](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/mrq-4.png)
+![MRQ Success](doc/img/mrq-4.png)
 
 ### Tables
 
@@ -395,7 +395,7 @@ questions.
 </mentoring>
 ```
 
-![Mentoring Table](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/mentoring-table.png)
+![Mentoring Table](doc/img/mentoring-table.png)
 
 ### Data export
 
@@ -408,7 +408,7 @@ under `Settings -> Advanced` in the Studio.
 The Data export XBlock renders a button that will download a CSV file
 when clicked.
 
-![Data Export XBlock](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/dataexport.png)
+![Data Export XBlock](doc/img/dataexport.png)
 
 The Data export XBlock is intented to be used as a tool by admins in
 the Studio, and is not meant to be published on a live course.
@@ -436,11 +436,24 @@ setting the `max_attempts` attribute of the `<mentoring>` element.
 
 Before submitting an answer for the first time:
 
-![Max Attempts Before](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/max-attempts-before.png)
+![Max Attempts Before](doc/img/max-attempts-before.png)
 
 After submitting a wrong answer two times:
 
-![Max Attempts Reached](https://raw.githubusercontent.com/edx-solutions/xblock-mentoring/1fb5e3ece6f34b6cf33c956a4fba1d7cbb7349a2/doc/img/max-attempts-reached.png)
+![Max Attempts Reached](doc/img/max-attempts-reached.png)
+
+### Extended Feedback
+
+For a more detailed feedback, the mentoring tag can have the attribute `extended_feedback="true"`.
+This will give the user a laid out list of the questions they have answered, and whether or not
+their answers were correct, allowing them to review each. Extended feedback only works with
+assessment mode.
+
+![Extended Review](doc/img/extended-review.png)
+
+Once clicking on the question, they will see the review information for each of them.
+
+![Extended Feedback Question](doc/img/extended-feedback-question.png)
 
 ### Custom tip popup window size
 

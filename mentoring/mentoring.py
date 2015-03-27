@@ -23,6 +23,7 @@
 
 # Imports ###########################################################
 
+import json
 import logging
 import uuid
 import re
@@ -71,6 +72,11 @@ def _is_default_xml_content(value):
 
 Score = namedtuple("Score", ["raw", "percentage", "correct", "incorrect", "partially_correct"])
 
+CORRECT = 'correct'
+INCORRECT = 'incorrect'
+PARTIAL = 'partial'
+
+
 class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
     """
     An XBlock providing mentoring capabilities
@@ -112,7 +118,8 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
                    default=0, scope=Scope.user_state, enforce_type=True)
     student_results = List(help="Store results of student choices.", default=[],
                            scope=Scope.user_state)
-
+    extended_feedback = Boolean(help="Show extended feedback details when all attempts are used up.",
+                                default=False, Scope=Scope.content)
     display_name = String(help="Display name of the component", default="Mentoring XBlock",
                           scope=Scope.settings)
     icon_class = 'problem'
@@ -128,16 +135,37 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
     def is_assessment(self):
         return self.mode == 'assessment'
 
+    def get_question_number(self, question_id):
+        """
+        Get the step number of the question id
+        """
+        for question in self.get_children_objects():
+            if hasattr(question, 'step_number') and (question.name == question_id):
+                return question.step_number
+        raise ValueError("Question ID in answer set not a step of this Mentoring Block!")
+
+    def answer_mapper(self, answer_status):
+        """
+        Create a JSON-dumpable object with readable key names from a list of student answers.
+        """
+        return [
+            {
+                'number': self.get_question_number(answer[0]),
+                'id': answer[0],
+                'details': answer[1],
+            } for answer in self.student_results if answer[1]['status'] == answer_status
+        ]
+
     @property
     def score(self):
         """Compute the student score taking into account the light child weight."""
         total_child_weight = sum(float(step.weight) for step in self.steps)
         if total_child_weight == 0:
-            return (0, 0, 0, 0)
+            return Score(0, 0, [], [], [])
         score = sum(r[1]['score'] * r[1]['weight'] for r in self.student_results) / total_child_weight
-        correct = sum(1 for r in self.student_results if r[1]['status'] == 'correct')
-        incorrect = sum(1 for r in self.student_results if r[1]['status'] == 'incorrect')
-        partially_correct = sum(1 for r in self.student_results if r[1]['status'] == 'partial')
+        correct = self.answer_mapper(CORRECT)
+        incorrect = self.answer_mapper(INCORRECT)
+        partially_correct = self.answer_mapper(PARTIAL)
 
         return Score(score, int(round(score * 100)), correct, incorrect, partially_correct)
 
@@ -147,6 +175,25 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
             return self.get_message_html('on-assessment-review')
         else:
             return None
+
+    def show_extended_feedback(self):
+        return self.extended_feedback and self.max_attempts_reached
+
+    def feedback_dispatch(self, target_data, stringify):
+        if self.show_extended_feedback():
+            if stringify:
+                return json.dumps(target_data)
+            else:
+                return target_data
+
+    def correct_json(self, stringify=True):
+        return self.feedback_dispatch(self.score.correct, stringify)
+
+    def incorrect_json(self, stringify=True):
+        return self.feedback_dispatch(self.score.incorrect, stringify)
+
+    def partial_json(self, stringify=True):
+        return self.feedback_dispatch(self.score.partially_correct, stringify)
 
     def student_view(self, context):
         # Migrate stored data if necessary
@@ -172,6 +219,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/mentoring.js'))
         fragment.add_resource(loader.load_unicode('templates/html/mentoring_attempts.html'), "text/html")
         fragment.add_resource(loader.load_unicode('templates/html/mentoring_grade.html'), "text/html")
+        fragment.add_resource(loader.load_unicode('templates/html/mentoring_review_questions.html'), "text/html")
 
         fragment.initialize_js('MentoringBlock')
 
@@ -189,7 +237,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         if self.student_results and 'completed' in self.student_results[0][1]:
             # Rename the field and use the new value format (text instead of boolean)
             for result in self.student_results:
-                result[1]['status'] = 'correct' if result[1]['completed'] else 'incorrect'
+                result[1]['status'] = CORRECT if result[1]['completed'] else INCORRECT
                 del result[1]['completed']
 
     @property
@@ -235,6 +283,60 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         return '/jump_to_id/{}'.format(self.next_step)
 
     @XBlock.json_handler
+    def get_results(self, queries, suffix=''):
+        """
+        Gets detailed results in the case of extended feedback.
+
+        It may be a good idea to eventually have this function get results
+        in the general case instead of loading them in the template in the future,
+        and only using it for extended feedback situations.
+
+        Right now there are two ways to get results-- through the template upon loading up
+        the mentoring block, or after submission of an AJAX request like in
+        submit or get_results here.
+        """
+        results = []
+        if not self.show_extended_feedback():
+            return {
+                'results': [],
+                'error': 'Extended feedback results cannot be obtained.'
+            }
+        completed = True
+        choices = dict(self.student_results)
+        step = self.step
+        # Only one child should ever be of concern with this method.
+        for child in self.get_children_objects():
+            if child.name and child.name in queries:
+                results = [child.name, child.get_results(choices[child.name])]
+                # Children may have their own definition of 'completed' which can vary from the general case
+                # of the whole mentoring block being completed. This is because in standard mode, all children
+                # must be correct to complete the block. In assessment mode with extended feedback, completion
+                # happens when you're out of attempts, no matter how you did.
+                completed = choices[child.name]['status']
+                break
+
+        # The 'completed' message should always be shown in this case, since no more attempts are available.
+        message = self.get_message(True)
+
+        return {
+            'results': results,
+            'completed': completed,
+            'attempted': self.attempted,
+            'message': message,
+            'step': step,
+            'max_attempts': self.max_attempts,
+            'num_attempts': self.num_attempts,
+        }
+
+    def get_message(self, completed):
+        if self.max_attempts_reached:
+            return self.get_message_html('max_attempts_reached')
+        elif completed:
+            return self.get_message_html('completed')
+        else:
+            return self.get_message_html('incomplete')
+
+    @XBlock.json_handler
     def submit(self, submissions, suffix=''):
         log.info(u'Received submissions: {}'.format(submissions))
         self.attempted = True
@@ -250,14 +352,9 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
                 child_result = child.submit(submission)
                 submit_results.append([child.name, child_result])
                 child.save()
-                completed = completed and (child_result['status'] == 'correct')
+                completed = completed and (child_result['status'] == CORRECT)
 
-        if self.max_attempts_reached:
-            message = self.get_message_html('max_attempts_reached')
-        elif completed:
-            message = self.get_message_html('completed')
-        else:
-            message = self.get_message_html('incomplete')
+        message = self.get_message(completed)
 
         # Once it has been completed once, keep completion even if user changes values
         if self.completed:
@@ -300,7 +397,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         })
 
         return {
-            'submitResults': submit_results,
+            'results': submit_results,
             'completed': self.completed,
             'attempted': self.attempted,
             'message': message,
@@ -309,7 +406,6 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         }
 
     def handleAssessmentSubmit(self, submissions, suffix):
-
         completed = False
         current_child = None
         children = [child for child in self.get_children_objects()
@@ -370,10 +466,14 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
             'num_attempts': self.num_attempts,
             'step': self.step,
             'score': score.percentage,
-            'correct_answer': score.correct,
-            'incorrect_answer': score.incorrect,
-            'partially_correct_answer': score.partially_correct,
-            'message': message
+            'correct_answer': len(score.correct),
+            'incorrect_answer': len(score.incorrect),
+            'partially_correct_answer': len(score.partially_correct),
+            'extended_feedback': self.show_extended_feedback() or '',
+            'correct': self.correct_json(stringify=False),
+            'incorrect': self.incorrect_json(stringify=False),
+            'partial': self.partial_json(stringify=False),
+            'message': message,
         }
 
     @XBlock.json_handler
@@ -435,7 +535,6 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
     def studio_submit(self, submissions, suffix=''):
         log.info(u'Received studio submissions: {}'.format(submissions))
 
-        success = True
         xml_content = submissions['xml_content']
         try:
             content = etree.parse(StringIO(xml_content))
@@ -444,8 +543,9 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
                 'result': 'error',
                 'message': e.message
             }
-            success = False
+
         else:
+            success = True
             root = content.getroot()
             if 'mode' in root.attrib:
                 if root.attrib['mode'] not in self.MENTORING_MODES:

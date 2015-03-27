@@ -48,8 +48,25 @@ class MRQBlock(QuestionnaireAbstractBlock):
     def submit(self, submissions):
         log.debug(u'Received MRQ submissions: "%s"', submissions)
 
-        score = 0
+        result = self.calculate_results(submissions)
+        self.student_choices = submissions
 
+        log.debug(u'MRQ submissions result: %s', result)
+        return result
+
+    def get_results(self, previous_result):
+        """
+        Get the results a student has already submitted.
+        """
+        result = self.calculate_results(previous_result['submissions'])
+        result['completed'] = True
+        return result
+
+    def calculate_results(self, submissions):
+        """
+        Tally choices based upon a set of submissions.
+        """
+        score = 0
         results = []
         for choice in self.custom_choices:
             choice_completed = True
@@ -81,8 +98,6 @@ class MRQBlock(QuestionnaireAbstractBlock):
 
             results.append(choice_result)
 
-        self.student_choices = submissions
-
         status = 'incorrect' if score <= 0 else 'correct' if score >= len(results) else 'partial'
 
         result = {
@@ -94,5 +109,5 @@ class MRQBlock(QuestionnaireAbstractBlock):
             'score': float(score) / len(results),
         }
 
-        log.debug(u'MRQ submissions result: %s', result)
         return result
+

@@ -182,32 +182,13 @@ class MCQBlockTest(MentoringBaseTest):
 
     def test_mcq_feedback_popups(self):
         mentoring = self.go_to_page('Mcq With Comments 1')
-        choices_list = mentoring.find_element_by_css_selector(".choices-list")
-
         item_feedbacks = [
             "This is something everyone has to like about this MRQ",
             "This is something everyone has to like about beauty",
             "This MRQ is indeed very graceful",
-            "Nah, there isn\\'t any!"
+            "Nah, there aren\\'t any!"
         ]
-        submit = mentoring.find_element_by_css_selector('.submit input.input-main')
-
-        for index, expected_feedback in enumerate(item_feedbacks):
-            choice_wrapper = choices_list.find_elements_by_css_selector(".choice")[index]
-            choice_wrapper.find_element_by_css_selector(".choice-selector input").click()  # clicking on actual radio button
-            submit.click()
-            item_feedback_icon = choice_wrapper.find_element_by_css_selector(".choice-result")
-            choice_wrapper.click()
-            item_feedback_icon.click()  # clicking on item feedback icon
-            item_feedback_popup = choice_wrapper.find_element_by_css_selector(".choice-tips")
-            self.assertTrue(item_feedback_popup.is_displayed())
-            self.assertEqual(item_feedback_popup.text, expected_feedback)
-
-            item_feedback_popup.click()
-            self.assertTrue(item_feedback_popup.is_displayed())
-
-            mentoring.click()
-            self.assertFalse(item_feedback_popup.is_displayed())
+        self.popup_check(mentoring, item_feedbacks)
 
     def _get_questionnaire_options(self, questionnaire):
         result = []

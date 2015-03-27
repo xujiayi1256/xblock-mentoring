@@ -1,5 +1,6 @@
 function MentoringAssessmentView(runtime, element, mentoring) {
     var gradeTemplate = _.template($('#xblock-grade-template').html());
+    var reviewQuestionsTemplate = _.template($('#xblock-review-questions-template').html());
     var submitDOM, nextDOM, reviewDOM, tryAgainDOM, messagesDOM;
     var submitXHR;
     var checkmark;
@@ -22,8 +23,24 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         messagesDOM.empty().hide();
     }
 
+    function no_more_attempts() {
+        var attempts_data = $('.attempts', element).data();
+        return attempts_data.num_attempts >= attempts_data.max_attempts;
+    }
+
     function renderGrade() {
         var data = $('.grade', element).data();
+        data.enable_extended = (no_more_attempts() && data.extended_feedback);
+        _.extend(data, {
+            'enable_extended': (no_more_attempts() && data.extended_feedback),
+            'runDetails': function(label) {
+                if (! this.enable_extended) {
+                    return '.'
+                }
+                var self = this;
+                return reviewQuestionsTemplate({'questions': self[label], 'label': label})
+            }
+        });
         cleanAll();
         $('.grade', element).html(gradeTemplate(data));
         reviewDOM.hide();
@@ -31,8 +48,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         nextDOM.hide();
         tryAgainDOM.show();
 
-        var attempts_data = $('.attempts', element).data();
-        if (attempts_data.num_attempts >= attempts_data.max_attempts) {
+        if (no_more_attempts()) {
             tryAgainDOM.attr("disabled", "disabled");
         }
         else {
@@ -41,10 +57,11 @@ function MentoringAssessmentView(runtime, element, mentoring) {
 
         mentoring.renderAttempts();
 
-        if (data.assessment_message && data.num_attempts < data.max_attempts) {
+        if (data.assessment_message && ! no_more_attempts()) {
             mentoring.setContent(messagesDOM, data.assessment_message);
             messagesDOM.show();
         }
+        $('a.question-link', element).click(jumpToName);
     }
 
     function handleTryAgain(result) {
@@ -61,7 +78,6 @@ function MentoringAssessmentView(runtime, element, mentoring) {
     }
 
     function tryAgain() {
-        var success = true;
         var handlerUrl = runtime.handlerUrl(element, 'try_again');
         if (submitXHR) {
             submitXHR.abort();
@@ -99,6 +115,29 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         return (active_child == mentoring.children.length);
     }
 
+    function getByName(name) {
+        return $(element).find('div[name="' + name + '"]');
+    }
+
+    function jumpToName (event) {
+        // Used only during extended feedback. Assumes completion and attempts exhausted.
+        event.preventDefault();
+        var options = {
+            onChange: onChange
+        };
+
+        var target = getByName($(event.target).data('name'));
+        active_child = parseInt(target.data('step'));
+        cleanAll();
+        mentoring.displayChild(active_child, options);
+        mentoring.publish_event({
+            event_type: 'xblock.mentoring.assessment.review',
+            exercise_id: $(target).attr('name')
+        });
+        post_display();
+        get_results();
+    }
+
     function displayNextChild() {
         var options = {
             onChange: onChange
@@ -119,10 +158,21 @@ function MentoringAssessmentView(runtime, element, mentoring) {
             ++active_child;
         }
 
-        if (isDone())
+        if (isDone()) {
             renderGrade();
+        } else {
+            post_display();
+        }
+    }
+
+    function post_display(results) {
         nextDOM.attr('disabled', 'disabled');
-        reviewDOM.attr('disabled', 'disabled');
+        if (no_more_attempts()) {
+            reviewDOM.show();
+            reviewDOM.removeAttr('disabled')
+        } else {
+            reviewDOM.attr('disabled', 'disabled');
+        }
         validateXBlock();
     }
 
@@ -135,20 +185,20 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         }
     }
 
-    function handleSubmitResults(result) {
-        $('.grade', element).data('score', result.score);
-        $('.grade', element).data('correct_answer', result.correct_answer);
-        $('.grade', element).data('incorrect_answer', result.incorrect_answer);
-        $('.grade', element).data('partially_correct_answer', result.partially_correct_answer);
-        $('.grade', element).data('max_attempts', result.max_attempts);
-        $('.grade', element).data('num_attempts', result.num_attempts);
-        $('.grade', element).data('assessment_message', result.message);
-        $('.attempts', element).data('max_attempts', result.max_attempts);
-        $('.attempts', element).data('num_attempts', result.num_attempts);
+    function handleResults(response) {
+        $('.grade', element).data('score', response.score);
+        $('.grade', element).data('correct_answer', response.correct_answer);
+        $('.grade', element).data('incorrect_answer', response.incorrect_answer);
+        $('.grade', element).data('partially_correct_answer', response.partially_correct_answer);
+        $('.grade', element).data('max_attempts', response.max_attempts);
+        $('.grade', element).data('num_attempts', response.num_attempts);
+        $('.grade', element).data('assessment_message', response.message);
+        $('.attempts', element).data('max_attempts', response.max_attempts);
+        $('.attempts', element).data('num_attempts', response.num_attempts);
 
-        if (result.completed === 'partial') {
+        if (response.completed === 'partial') {
             checkmark.addClass('checkmark-partially-correct icon-ok fa-check');
-        } else if (result.completed === 'correct') {
+        } else if (response.completed === 'correct') {
             checkmark.addClass('checkmark-correct icon-ok fa-check');
         } else {
             checkmark.addClass('checkmark-incorrect icon-exclamation fa-exclamation');
@@ -157,9 +207,8 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         submitDOM.attr('disabled', 'disabled');
 
         /* Something went wrong with student submission, denied next question */
-        if (result.step != active_child+1) {
-            active_child = result.step-1;
-            displayNextChild();
+        if (response.step != active_child+1) {
+            active_child = response.step-1;
         }
         else {
             nextDOM.removeAttr("disabled");
@@ -167,28 +216,50 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         }
     }
 
-    function submit() {
-        var success = true;
+    function handleReviewResults(response) {
+        handleResults(response);
+        var options = {
+            max_attempts: response.max_attempts,
+            num_attempts: response.num_attempts
+        };
+        var name = response.results[0];
+        var result = response.results[1];
+        var target = getByName(name);
+        var child = mentoring.children[target.data('step')];
+        callIfExists(child, 'handleSubmit', result, options);
+        callIfExists(child, 'handleReview', result, options);
+    }
+
+    function handleSubmitResults(response){
+        handleResults(response);
+        // Update grade information
+        $('.grade').data(response);
+    }
+
+    function calculate_results(handler_name, callback) {
         var data = {};
         var child = mentoring.children[active_child];
         if (child && child.name !== undefined) {
-            data[child.name] = callIfExists(child, 'submit');
+            data[child.name] = callIfExists(child, handler_name);
         }
-        var handlerUrl = runtime.handlerUrl(element, 'submit');
+        var handlerUrl = runtime.handlerUrl(element, handler_name);
         if (submitXHR) {
             submitXHR.abort();
         }
-        submitXHR = $.post(handlerUrl, JSON.stringify(data)).success(handleSubmitResults);
+        submitXHR = $.post(handlerUrl, JSON.stringify(data)).success(callback);
+    }
+
+    function submit() {
+        calculate_results('submit', handleSubmitResults)
+    }
+
+    function get_results() {
+        calculate_results('get_results', handleReviewResults)
     }
 
     function validateXBlock() {
         var is_valid = true;
-        var data = $('.attempts', element).data();
-        var children = mentoring.children;
 
-        // if ((data.max_attempts > 0) && (data.num_attempts >= data.max_attempts)) {
-        //     is_valid = false;
-        // }
         var child = mentoring.children[active_child];
         if (child && child.name !== undefined) {
             var child_validation = callIfExists(child, 'validate');
@@ -213,4 +284,5 @@ function MentoringAssessmentView(runtime, element, mentoring) {
     }
 
     initXBlockView();
+
 }

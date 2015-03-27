@@ -1,4 +1,4 @@
-<mentoring url_name="{{ url_name }}" display_name="Nav tooltip title" weight="1" mode="assessment" max_attempts="10">
+<mentoring url_name="{{ url_name }}" display_name="Nav tooltip title" weight="1" mode="assessment" max_attempts="10" extended_feedback="true">
     <title>Default Title</title>
     <shared-header>
         <p>This paragraph is shared between <strong>all</strong> questions.</p>
@@ -32,7 +32,7 @@
         <tip reject="notwant">Your loss!</tip>
     </mcq>
 
-    <mrq name="mrq_1_1" type="choices">
+    <mrq name="mrq_1_3" type="choices">
         <question>What do you like in this MRQ?</question>
         <choice value="elegance">Its elegance</choice>
         <choice value="beauty">Its beauty</choice>
@@ -41,6 +41,6 @@
 
         <tip require="gracefulness">This MRQ is indeed very graceful</tip>
         <tip require="elegance,beauty">This is something everyone has to like about this MRQ</tip>
-        <tip reject="bugs">Nah, there isn't any!</tip>
+        <tip reject="bugs">Nah, there aren't any!</tip>
     </mrq>
 </mentoring>

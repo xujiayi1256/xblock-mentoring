@@ -32,3 +32,26 @@ class MentoringBaseTest(SeleniumBaseTest):
     def wait_until_visible(self, elem):
         wait = WebDriverWait(elem, self.timeout)
         wait.until(lambda e: e.is_displayed(), u"{} should be hidden".format(elem.text))
+
+    def popup_check(self, mentoring, item_feedbacks, do_submit=True):
+        choices_list = mentoring.find_element_by_css_selector(".choices-list")
+
+        submit = mentoring.find_element_by_css_selector('.submit input.input-main')
+
+        for index, expected_feedback in enumerate(item_feedbacks):
+            choice_wrapper = choices_list.find_elements_by_css_selector(".choice")[index]
+            if do_submit:
+                choice_wrapper.find_element_by_css_selector(".choice-selector input").click()  # clicking on actual radio button
+                submit.click()
+            item_feedback_icon = choice_wrapper.find_element_by_css_selector(".choice-result")
+            choice_wrapper.click()
+            item_feedback_icon.click()  # clicking on item feedback icon
+            item_feedback_popup = choice_wrapper.find_element_by_css_selector(".choice-tips")
+            self.assertTrue(item_feedback_popup.is_displayed())
+            self.assertEqual(item_feedback_popup.text, expected_feedback)
+
+            item_feedback_popup.click()
+            self.assertTrue(item_feedback_popup.is_displayed())
+
+            mentoring.click()
+            self.assertFalse(item_feedback_popup.is_displayed())

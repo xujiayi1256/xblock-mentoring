@@ -86,9 +86,12 @@ function MCQBlock(runtime, element, mentoring) {
             }
         },
 
+        handleReview: function(result){
+            $('.choice input[value="' + result.submission + '"]', element).prop('checked', true);
+            $('.choice input', element).prop('disabled', true);
+        },
+
         handleSubmit: function(result) {
-            if (this.mode === 'assessment')
-                return;
 
             var messageView = MessageView(element, mentoring);
             messageView.clearResult();
@@ -99,7 +102,6 @@ function MCQBlock(runtime, element, mentoring) {
                 var choiceDOM = choiceInputDOM.closest('.choice');
                 var choiceResultDOM = $('.choice-result', choiceDOM);
                 var choiceTipsDOM = $('.choice-tips', choiceDOM);
-                var choiceTipsCloseDOM;
 
                 if (result.status === "correct" && choiceInputDOM.val() === result.submission) {
                     choiceResultDOM.addClass('checkmark-correct icon-ok fa-check');
@@ -112,7 +114,6 @@ function MCQBlock(runtime, element, mentoring) {
                     mentoring.setContent(choiceTipsDOM, result.tips);
                 }
 
-                choiceTipsCloseDOM = $('.close', choiceTipsDOM);
                 choiceResultDOM.off('click').on('click', function() {
                     if (choiceTipsDOM.html() !== '') {
                         messageView.showMessage(choiceTipsDOM);
@@ -158,9 +159,14 @@ function MRQBlock(runtime, element, mentoring) {
             return checkedValues;
         },
 
+        handleReview: function(result, options) {
+            $.each(result.submissions, function (index, value) {
+                $('input[type="checkbox"][value="' + value + '"]').prop('checked', true)
+            });
+            $('input', element).prop('disabled', true);
+        },
+
         handleSubmit: function(result, options) {
-            if (this.mode === 'assessment')
-                return;
 
             var messageView = MessageView(element, mentoring);
 
@@ -168,18 +174,14 @@ function MRQBlock(runtime, element, mentoring) {
                 messageView.showMessage('<div class="message-content">' + result.message + '</div>'+
                                         '<div class="close icon-remove-sign fa-times-circle"></div>');
             }
-
             var questionnaireDOM = $('fieldset.questionnaire', element);
             var data = questionnaireDOM.data();
-            var hide_results = (data.hide_results === 'True') ? true : false;
-
+            var hide_results = (data.hide_results === 'True');
             $.each(result.choices, function(index, choice) {
                 var choiceInputDOM = $('.choice input[value='+choice.value+']', element);
                 var choiceDOM = choiceInputDOM.closest('.choice');
                 var choiceResultDOM = $('.choice-result', choiceDOM);
                 var choiceTipsDOM = $('.choice-tips', choiceDOM);
-                var choiceTipsCloseDOM;
-
                 /* show hint if checked or max_attempts is disabled */
                 if (!hide_results &&
                     (result.completed || choiceInputDOM.prop('checked') || options.max_attempts <= 0)) {
@@ -188,10 +190,8 @@ function MRQBlock(runtime, element, mentoring) {
                     } else if (!choice.completed) {
                         choiceResultDOM.addClass('checkmark-incorrect icon-exclamation fa-exclamation');
                     }
-
                     mentoring.setContent(choiceTipsDOM, choice.tips);
 
-                    choiceTipsCloseDOM = $('.close', choiceTipsDOM);
                     choiceResultDOM.off('click').on('click', function() {
                         messageView.showMessage(choiceTipsDOM);
                     });
