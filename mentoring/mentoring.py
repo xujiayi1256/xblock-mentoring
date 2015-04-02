@@ -411,7 +411,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         children = [child for child in self.get_children_objects()
                     if not isinstance(child, self.FLOATING_BLOCKS)]
 
-        message = None
+        assessment_message = None
 
         for child in children:
             if child.name and child.name in submissions:
@@ -448,7 +448,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
                     'score_type': 'proficiency',
                 })
                 event_data['final_grade'] = score.raw
-                message = self.assessment_message
+                assessment_message = self.assessment_message
 
             self.num_attempts += 1
             self.completed = True
@@ -473,7 +473,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
             'correct': self.correct_json(stringify=False),
             'incorrect': self.incorrect_json(stringify=False),
             'partial': self.partial_json(stringify=False),
-            'message': message,
+            'assessment_message': assessment_message,
         }
 
     @XBlock.json_handler

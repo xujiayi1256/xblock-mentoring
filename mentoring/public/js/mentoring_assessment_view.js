@@ -91,7 +91,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         reviewDOM = $(element).find('.submit .input-review');
         tryAgainDOM = $(element).find('.submit .input-try-again');
         checkmark = $('.assessment-checkmark', element);
-        messagesDOM = $('.messages', element);
+        messagesDOM = $('.assessment-messages', element);
 
         submitDOM.show();
         submitDOM.bind('click', submit);
@@ -192,7 +192,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         $('.grade', element).data('partially_correct_answer', response.partially_correct_answer);
         $('.grade', element).data('max_attempts', response.max_attempts);
         $('.grade', element).data('num_attempts', response.num_attempts);
-        $('.grade', element).data('assessment_message', response.message);
+        $('.grade', element).data('assessment_message', response.assessment_message);
         $('.attempts', element).data('max_attempts', response.max_attempts);
         $('.attempts', element).data('num_attempts', response.num_attempts);
 
