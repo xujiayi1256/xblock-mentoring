@@ -127,7 +127,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         };
 
         var target = getByName($(event.target).data('name'));
-        active_child = parseInt(target.data('step'));
+        active_child = $.inArray(target[0], mentoring.children_dom);
         cleanAll();
         mentoring.displayChild(active_child, options);
         mentoring.publish_event({
@@ -153,11 +153,10 @@ function MentoringAssessmentView(runtime, element, mentoring) {
                 event_type: 'xblock.mentoring.assessment.shown',
                 exercise_id: $(child).attr('name')
             });
-            if ((typeof child !== 'undefined') || active_child == mentoring.children.length-1)
+            if ((typeof child !== 'undefined') || active_child >= mentoring.children.length-1)
                 break;
             ++active_child;
         }
-
         if (isDone()) {
             renderGrade();
         } else {
@@ -206,14 +205,12 @@ function MentoringAssessmentView(runtime, element, mentoring) {
 
         submitDOM.attr('disabled', 'disabled');
 
-        /* Something went wrong with student submission, denied next question */
+        /* We're not dealing with the current step */
         if (response.step != active_child+1) {
-            active_child = response.step-1;
+            return
         }
-        else {
-            nextDOM.removeAttr("disabled");
-            reviewDOM.removeAttr("disabled");
-        }
+        nextDOM.removeAttr("disabled");
+        reviewDOM.removeAttr("disabled");
     }
 
     function handleReviewResults(response) {
@@ -222,10 +219,8 @@ function MentoringAssessmentView(runtime, element, mentoring) {
             max_attempts: response.max_attempts,
             num_attempts: response.num_attempts
         };
-        var name = response.results[0];
         var result = response.results[1];
-        var target = getByName(name);
-        var child = mentoring.children[target.data('step')];
+        var child = mentoring.children[active_child];
         callIfExists(child, 'handleSubmit', result, options);
         callIfExists(child, 'handleReview', result, options);
     }
