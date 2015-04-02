@@ -157,3 +157,7 @@
     display: block;
     clear: both;
 }
+
+.mentoring .review-link {
+    float: right;
+}

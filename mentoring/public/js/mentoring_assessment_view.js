@@ -1,7 +1,7 @@
 function MentoringAssessmentView(runtime, element, mentoring) {
     var gradeTemplate = _.template($('#xblock-grade-template').html());
     var reviewQuestionsTemplate = _.template($('#xblock-review-questions-template').html());
-    var submitDOM, nextDOM, reviewDOM, tryAgainDOM, messagesDOM;
+    var submitDOM, nextDOM, reviewDOM, tryAgainDOM, messagesDOM, reviewLinkDOM;
     var submitXHR;
     var checkmark;
     var active_child;
@@ -28,7 +28,10 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         return attempts_data.num_attempts >= attempts_data.max_attempts;
     }
 
-    function renderGrade() {
+    function renderGrade(event) {
+        if (event) {
+            event.preventDefault()
+        }
         var data = $('.grade', element).data();
         data.enable_extended = (no_more_attempts() && data.extended_feedback);
         _.extend(data, {
@@ -44,6 +47,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         cleanAll();
         $('.grade', element).html(gradeTemplate(data));
         reviewDOM.hide();
+        reviewLinkDOM.hide();
         submitDOM.hide();
         nextDOM.hide();
         tryAgainDOM.show();
@@ -89,14 +93,17 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         submitDOM = $(element).find('.submit .input-main');
         nextDOM = $(element).find('.submit .input-next');
         reviewDOM = $(element).find('.submit .input-review');
+        reviewLinkDOM = $(element).find('.review-link')
         tryAgainDOM = $(element).find('.submit .input-try-again');
         checkmark = $('.assessment-checkmark', element);
         messagesDOM = $('.messages', element);
 
+        reviewLinkDOM.hide();
         submitDOM.show();
         submitDOM.bind('click', submit);
         nextDOM.bind('click', displayNextChild);
         nextDOM.show();
+        reviewLinkDOM.bind('click', renderGrade)
         reviewDOM.bind('click', renderGrade);
         tryAgainDOM.bind('click', tryAgain);
 
@@ -134,7 +141,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
             event_type: 'xblock.mentoring.assessment.review',
             exercise_id: $(target).attr('name')
         });
-        post_display();
+        post_display(true);
         get_results();
     }
 
@@ -164,15 +171,19 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         }
     }
 
-    function post_display(results) {
+    function post_display(show_link) {
         nextDOM.attr('disabled', 'disabled');
         if (no_more_attempts()) {
-            reviewDOM.show();
-            reviewDOM.removeAttr('disabled')
+            if (show_link) {
+                reviewLinkDOM.show();
+            } else {
+                reviewDOM.show();
+                reviewDOM.removeAttr('disabled')
+            }
         } else {
             reviewDOM.attr('disabled', 'disabled');
         }
-        validateXBlock();
+        validateXBlock(show_link);
     }
 
     function onChange() {
@@ -252,7 +263,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         calculate_results('get_results', handleReviewResults)
     }
 
-    function validateXBlock() {
+    function validateXBlock(hide_nav) {
         var is_valid = true;
 
         var child = mentoring.children[active_child];
@@ -271,7 +282,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
             submitDOM.removeAttr("disabled");
         }
 
-        if (isLastChild()) {
+        if (isLastChild() && ! hide_nav) {
             nextDOM.hide();
             reviewDOM.show();
         }
