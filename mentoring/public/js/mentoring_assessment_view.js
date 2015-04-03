@@ -28,10 +28,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         return attempts_data.num_attempts >= attempts_data.max_attempts;
     }
 
-    function renderGrade(event) {
-        if (event) {
-            event.preventDefault()
-        }
+    function renderGrade() {
         var data = $('.grade', element).data();
         data.enable_extended = (no_more_attempts() && data.extended_feedback);
         _.extend(data, {
@@ -103,8 +100,12 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         submitDOM.bind('click', submit);
         nextDOM.bind('click', displayNextChild);
         nextDOM.show();
-        reviewLinkDOM.bind('click', renderGrade)
-        reviewDOM.bind('click', renderGrade);
+        function renderGradeEvent(event) {
+            event.preventDefault();
+            renderGrade();
+        }
+        reviewLinkDOM.bind('click', renderGradeEvent)
+        reviewDOM.bind('click', renderGradeEvent);
         tryAgainDOM.bind('click', tryAgain);
 
         active_child = mentoring.step-1;
