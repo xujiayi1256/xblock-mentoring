@@ -92,6 +92,7 @@ class MentoringAssessmentTest(MentoringBaseTest):
         controls.next_question = mentoring.find_element_by_css_selector("input.input-next")
         controls.review = mentoring.find_element_by_css_selector("input.input-review")
         controls.try_again = mentoring.find_element_by_css_selector("input.input-try-again")
+        controls.review_link = mentoring.find_element_by_css_selector(".review-link a")
 
         return mentoring, controls
 
@@ -220,7 +221,9 @@ class MentoringAssessmentTest(MentoringBaseTest):
         self._assert_checkmark(mentoring, result)
         self.do_post(controls, last)
 
-    def peek_at_multiple_choice_question(self, number, mentoring, controls, last=False, extended_feedback=False):
+    def peek_at_multiple_choice_question(
+            self, number, mentoring, controls, last=False, extended_feedback=False, alternative_review=False,
+    ):
         self.wait_until_text_in(self.question_text(number), mentoring)
         self.assert_persistent_elements_present(mentoring)
         self._selenium_bug_workaround_scroll_to(mentoring)
@@ -228,7 +231,10 @@ class MentoringAssessmentTest(MentoringBaseTest):
 
         if extended_feedback:
             self.assert_hidden(controls.submit)
-            self.assert_clickable(controls.review)
+            if alternative_review:
+                self.assert_clickable(controls.review_link)
+            else:
+                self.assert_clickable(controls.review)
         else:
             self.assert_disabled(controls.submit)
             self.ending_controls(controls, last)
@@ -278,6 +284,7 @@ class MentoringAssessmentTest(MentoringBaseTest):
         self.assert_hidden(controls.submit)
         self.assert_hidden(controls.next_question)
         self.assert_hidden(controls.review)
+        self.assert_hidden(controls.review_link)
 
     def assert_messages_text(self, mentoring, text):
         messages = mentoring.find_element_by_css_selector('.messages')
@@ -292,8 +299,9 @@ class MentoringAssessmentTest(MentoringBaseTest):
 
     def extended_feedback_checks(self, mentoring, controls):
         # Multiple choice is third correctly answered question
+        self.assert_hidden(controls.review_link)
         mentoring.find_elements_by_css_selector('.correct-list li a')[2].click()
-        self.peek_at_multiple_choice_question(4, mentoring, controls, extended_feedback=True)
+        self.peek_at_multiple_choice_question(4, mentoring, controls, extended_feedback=True, alternative_review=True)
         # Four correct items, plus the overall correct indicator.
         correct_marks = mentoring.find_elements_by_css_selector('.checkmark-correct')
         incorrect_marks = mentoring.find_elements_by_css_selector('.checkmark-incorrect')
@@ -349,7 +357,7 @@ class MentoringAssessmentTest(MentoringBaseTest):
         self.assert_messages_empty(mentoring)
         if extended_feedback:
             self.extended_feedback_checks(mentoring, controls)
-            controls.review.click()
+            controls.review_link.click()
             self.peek_at_review(mentoring, controls, expected_results, extended_feedback=True)
 
     def test_single_question_assessment(self):

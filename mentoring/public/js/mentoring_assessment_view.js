@@ -1,7 +1,7 @@
 function MentoringAssessmentView(runtime, element, mentoring) {
     var gradeTemplate = _.template($('#xblock-grade-template').html());
     var reviewQuestionsTemplate = _.template($('#xblock-review-questions-template').html());
-    var submitDOM, nextDOM, reviewDOM, tryAgainDOM, messagesDOM;
+    var submitDOM, nextDOM, reviewDOM, tryAgainDOM, messagesDOM, reviewLinkDOM;
     var submitXHR;
     var checkmark;
     var active_child;
@@ -44,6 +44,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         cleanAll();
         $('.grade', element).html(gradeTemplate(data));
         reviewDOM.hide();
+        reviewLinkDOM.hide();
         submitDOM.hide();
         nextDOM.hide();
         tryAgainDOM.show();
@@ -89,15 +90,22 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         submitDOM = $(element).find('.submit .input-main');
         nextDOM = $(element).find('.submit .input-next');
         reviewDOM = $(element).find('.submit .input-review');
+        reviewLinkDOM = $(element).find('.review-link')
         tryAgainDOM = $(element).find('.submit .input-try-again');
         checkmark = $('.assessment-checkmark', element);
         messagesDOM = $('.assessment-messages', element);
 
+        reviewLinkDOM.hide();
         submitDOM.show();
         submitDOM.bind('click', submit);
         nextDOM.bind('click', displayNextChild);
         nextDOM.show();
-        reviewDOM.bind('click', renderGrade);
+        function renderGradeEvent(event) {
+            event.preventDefault();
+            renderGrade();
+        }
+        reviewLinkDOM.bind('click', renderGradeEvent)
+        reviewDOM.bind('click', renderGradeEvent);
         tryAgainDOM.bind('click', tryAgain);
 
         active_child = mentoring.step-1;
@@ -127,14 +135,14 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         };
 
         var target = getByName($(event.target).data('name'));
-        active_child = parseInt(target.data('step'));
+        active_child = $.inArray(target[0], mentoring.children_dom);
         cleanAll();
         mentoring.displayChild(active_child, options);
         mentoring.publish_event({
             event_type: 'xblock.mentoring.assessment.review',
             exercise_id: $(target).attr('name')
         });
-        post_display();
+        post_display(true);
         get_results();
     }
 
@@ -153,11 +161,10 @@ function MentoringAssessmentView(runtime, element, mentoring) {
                 event_type: 'xblock.mentoring.assessment.shown',
                 exercise_id: $(child).attr('name')
             });
-            if ((typeof child !== 'undefined') || active_child == mentoring.children.length-1)
+            if ((typeof child !== 'undefined') || active_child >= mentoring.children.length-1)
                 break;
             ++active_child;
         }
-
         if (isDone()) {
             renderGrade();
         } else {
@@ -165,15 +172,19 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         }
     }
 
-    function post_display(results) {
+    function post_display(show_link) {
         nextDOM.attr('disabled', 'disabled');
         if (no_more_attempts()) {
-            reviewDOM.show();
-            reviewDOM.removeAttr('disabled')
+            if (show_link) {
+                reviewLinkDOM.show();
+            } else {
+                reviewDOM.show();
+                reviewDOM.removeAttr('disabled')
+            }
         } else {
             reviewDOM.attr('disabled', 'disabled');
         }
-        validateXBlock();
+        validateXBlock(show_link);
     }
 
     function onChange() {
@@ -206,14 +217,12 @@ function MentoringAssessmentView(runtime, element, mentoring) {
 
         submitDOM.attr('disabled', 'disabled');
 
-        /* Something went wrong with student submission, denied next question */
+        /* We're not dealing with the current step */
         if (response.step != active_child+1) {
-            active_child = response.step-1;
+            return
         }
-        else {
-            nextDOM.removeAttr("disabled");
-            reviewDOM.removeAttr("disabled");
-        }
+        nextDOM.removeAttr("disabled");
+        reviewDOM.removeAttr("disabled");
     }
 
     function handleReviewResults(response) {
@@ -222,10 +231,8 @@ function MentoringAssessmentView(runtime, element, mentoring) {
             max_attempts: response.max_attempts,
             num_attempts: response.num_attempts
         };
-        var name = response.results[0];
         var result = response.results[1];
-        var target = getByName(name);
-        var child = mentoring.children[target.data('step')];
+        var child = mentoring.children[active_child];
         callIfExists(child, 'handleSubmit', result, options);
         callIfExists(child, 'handleReview', result, options);
     }
@@ -257,7 +264,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         calculate_results('get_results', handleReviewResults)
     }
 
-    function validateXBlock() {
+    function validateXBlock(hide_nav) {
         var is_valid = true;
 
         var child = mentoring.children[active_child];
@@ -276,7 +283,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
             submitDOM.removeAttr("disabled");
         }
 
-        if (isLastChild()) {
+        if (isLastChild() && ! hide_nav) {
             nextDOM.hide();
             reviewDOM.show();
         }
