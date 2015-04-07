@@ -46,6 +46,10 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         reviewDOM.hide();
         reviewLinkDOM.hide();
         submitDOM.hide();
+        if (data.enable_extended) {
+            nextDOM.unbind('click')
+            nextDOM.bind('click', reviewNextChild)
+        }
         nextDOM.hide();
         tryAgainDOM.show();
 
@@ -127,23 +131,31 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         return $(element).find('div[name="' + name + '"]');
     }
 
-    function jumpToName (event) {
+    function jumpToName(event) {
         // Used only during extended feedback. Assumes completion and attempts exhausted.
         event.preventDefault();
-        var options = {
-            onChange: onChange
-        };
 
         var target = getByName($(event.target).data('name'));
-        active_child = $.inArray(target[0], mentoring.children_dom);
+        reviewDisplayChild($.inArray(target[0], mentoring.children_dom), {});
+    }
+
+    function reviewDisplayChild(child_index, options) {
+        active_child = child_index;
         cleanAll();
         mentoring.displayChild(active_child, options);
         mentoring.publish_event({
             event_type: 'xblock.mentoring.assessment.review',
-            exercise_id: $(target).attr('name')
+            exercise_id: $(mentoring.children_dom[active_child]).attr('name')
         });
         post_display(true);
         get_results();
+    }
+
+    function reviewNextChild(event) {
+        nextDOM.attr('disabled', 'disabled')
+        nextDOM.hide()
+        findNextChild({})
+        reviewDisplayChild(active_child)
     }
 
     function displayNextChild() {
@@ -152,23 +164,30 @@ function MentoringAssessmentView(runtime, element, mentoring) {
         };
 
         cleanAll();
-
+        findNextChild(options, true);
         // find the next real child block to display. HTMLBlock are always displayed
-        ++active_child;
-        while (1) {
-            var child = mentoring.displayChild(active_child, options);
-            mentoring.publish_event({
-                event_type: 'xblock.mentoring.assessment.shown',
-                exercise_id: $(child).attr('name')
-            });
-            if ((typeof child !== 'undefined') || active_child >= mentoring.children.length-1)
-                break;
-            ++active_child;
-        }
         if (isDone()) {
             renderGrade();
         } else {
             post_display();
+        }
+    }
+
+    function findNextChild(options, fire_event) {
+        // Finds the next child, and does initial display. Intended to be called by a proper display
+        // wrapper like displayNextChild or reviewNextChild.
+        ++active_child;
+        while (1) {
+            var child = mentoring.displayChild(active_child, options);
+            if (fire_event) {
+                mentoring.publish_event({
+                    event_type: 'xblock.mentoring.assessment.shown',
+                    exercise_id: $(child).attr('name')
+                });
+            }
+            if ((typeof child !== 'undefined') || active_child >= mentoring.children.length-1)
+                break;
+            ++active_child;
         }
     }
 
@@ -185,6 +204,11 @@ function MentoringAssessmentView(runtime, element, mentoring) {
             reviewDOM.attr('disabled', 'disabled');
         }
         validateXBlock(show_link);
+        if (show_link && ! isLastChild()) {
+            // User should also be able to browse forward if we're showing the review link.
+            nextDOM.show();
+            nextDOM.removeAttr('disabled');
+        }
     }
 
     function onChange() {
