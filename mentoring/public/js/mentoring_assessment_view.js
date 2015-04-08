@@ -154,7 +154,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
     function reviewNextChild(event) {
         nextDOM.attr('disabled', 'disabled')
         nextDOM.hide()
-        findNextChild({})
+        findNextChild()
         reviewDisplayChild(active_child)
     }
 
@@ -176,6 +176,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
     function findNextChild(options, fire_event) {
         // Finds the next child, and does initial display. Intended to be called by a proper display
         // wrapper like displayNextChild or reviewNextChild.
+        options = options || {};
         ++active_child;
         while (1) {
             var child = mentoring.displayChild(active_child, options);
@@ -208,6 +209,13 @@ function MentoringAssessmentView(runtime, element, mentoring) {
             // User should also be able to browse forward if we're showing the review link.
             nextDOM.show();
             nextDOM.removeAttr('disabled');
+        }
+        if (show_link) {
+            // The user has no more tries, so the try again button is noise. A disabled submit button
+            // emphasizes that the user cannot change their answer.
+            tryAgainDOM.hide();
+            submitDOM.show()
+            submitDOM.attr('disabled', 'disabled')
         }
     }
 

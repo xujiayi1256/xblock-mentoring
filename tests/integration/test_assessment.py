@@ -230,9 +230,10 @@ class MentoringAssessmentTest(MentoringBaseTest):
         self.assertIn("What do you like in this MRQ?", mentoring.text)
 
         if extended_feedback:
-            self.assert_hidden(controls.submit)
+            self.assert_disabled(controls.submit)
             if alternative_review:
                 self.assert_clickable(controls.review_link)
+                self.assert_hidden(controls.try_again)
             else:
                 self.assert_clickable(controls.review)
         else:
@@ -314,6 +315,8 @@ class MentoringAssessmentTest(MentoringBaseTest):
             "Nah, there aren't any!"
         ]
         self.popup_check(mentoring, item_feedbacks, do_submit=False)
+        self.assert_hidden(controls.review)
+        self.assert_disabled(controls.submit)
         controls.review_link.click()
         self.peek_at_review(mentoring, controls, expected_results, extended_feedback=True)
         # Rating question, right before MRQ.
