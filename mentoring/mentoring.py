@@ -60,6 +60,9 @@ def _is_default_xml_content(value):
     UUID_PATTERN = '[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}'
     DUMMY_UUID = '12345678-1234-1234-1234-123456789abc'
 
+    if value is _default_xml_content:
+        return True
+
     expected = _default_xml_content()
 
     expected = re.sub(UUID_PATTERN, DUMMY_UUID, expected)
