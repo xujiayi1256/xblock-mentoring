@@ -170,7 +170,13 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         total_child_weight = sum(float(step.weight) for step in self.steps)
         if total_child_weight == 0:
             return Score(0, 0, [], [], [])
-        score = sum(r[1]['score'] * r[1]['weight'] for r in self.student_results) / total_child_weight
+        steps_map = {q.name: q for q in self.steps}
+        points_earned = 0
+        for q_name, q_details in self.student_results:
+            question = steps_map.get(q_name)
+            if question:
+                points_earned += q_details['score'] * question.weight
+        score = points_earned / total_child_weight
         correct = self.answer_mapper(CORRECT)
         incorrect = self.answer_mapper(INCORRECT)
         partially_correct = self.answer_mapper(PARTIAL)
