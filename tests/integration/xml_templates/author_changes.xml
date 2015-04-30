@@ -1,0 +1,25 @@
+<vertical_demo>
+    <mentoring url_name="mentoring1" enforce_dependency="false">
+
+        <mcq name="q1" type="choices">
+            <question>So, do you like this Q1?</question>
+            <choice value="yes">Yes</choice>
+            <tip display="yes">Great!</tip>
+            <choice value="no">No</choice>
+            <tip reject="no">Ah, damn.</tip>
+        </mcq>
+
+        <mrq name="q2">
+            <question>What do you like in this Q2?</question>
+            <choice value="elegance">Its elegance</choice>
+            <tip require="elegance"/>
+            <choice value="bugs">Its bugs</choice>
+            <tip reject="bugs"/>
+        </mrq>
+
+        <answer name="q3">
+            <question>What do you like about Q3?</question>
+        </answer>
+
+    </mentoring>
+</vertical_demo>
