@@ -163,4 +163,5 @@
 
 .mentoring .review-link {
     float: right;
+    display: none;
 }
