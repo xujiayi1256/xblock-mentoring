@@ -5,15 +5,18 @@
   <p>Note: if you retake this assessment, only your final score counts. If you would like to keep this score,
       please use the arrows below to move on to the next lesson.</p>
   <% }} %>
-  <h2>You scored <%= score %>% on this assessment.</h2>
-  <hr/>
-  <span class="assessment-checkmark icon-2x checkmark-correct icon-ok fa fa-check"></span>
-  <div class="results-section"><p>You answered <%= correct_answer %> questions correctly<%= runDetails('correct') %></div>
-  <div class="clear"></div>
-  <span class="assessment-checkmark icon-2x checkmark-partially-correct icon-ok fa fa-check"></span>
-  <div class="results-section"><p>You answered <%= partially_correct_answer %> questions partially correctly<%= runDetails('partial') %></div>
-  <div class="clear"></div>
-  <span class="assessment-checkmark icon-2x checkmark-incorrect icon-exclamation fa fa-exclamation"></span>
-  <div class="results-section"><p>You answered <%= incorrect_answer %> questions incorrectly<%= runDetails('incorrect') %></div>
-<div class="clear"></div>
+  <div class="grade-result">
+    <h2>You scored <%= score %>% on this assessment.</h2>
+    <hr/>
+    <span class="assessment-checkmark icon-2x checkmark-correct icon-ok fa fa-check"></span>
+    <div class="results-section"><p>You answered <%= correct_answer %> questions correctly<%= runDetails('correct') %></div>
+    <div class="clear"></div>
+    <span class="assessment-checkmark icon-2x checkmark-partially-correct icon-ok fa fa-check"></span>
+    <div class="results-section"><p>You answered <%= partially_correct_answer %> questions partially correctly<%= runDetails('partial') %></div>
+    <div class="clear"></div>
+    <span class="assessment-checkmark icon-2x checkmark-incorrect icon-exclamation fa fa-exclamation"></span>
+    <div class="results-section"><p>You answered <%= incorrect_answer %> questions incorrectly<%= runDetails('incorrect') %></div>
+    <div class="clear"></div>
+    <hr />
+  </div>
 </script>
