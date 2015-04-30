@@ -1,9 +1,0 @@
-ddt
-unicodecsv==0.9.4
-mock
-
--e git+https://github.com/edx-solutions/XBlock.git@b5acb81ad5b6fa02f53a7434c69ee87c4cc15950#egg=XBlock
--e git+https://github.com/edx-solutions/xblock-sdk.git@574ce51ca7f87213e1d8ba2f0365d32126a9030b#egg=xblock-sdk
--e git://github.com/edx-solutions/xblock-utils.git#egg=xblock-utils
-
--e .

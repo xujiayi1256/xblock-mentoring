@@ -20,20 +20,54 @@
 # along with this program in a file in the toplevel directory called
 # "AGPLv3".  If not, see <http://www.gnu.org/licenses/>.
 #
+"""
+Base classes for mentoring XBlock integration tests
+"""
 
-from xblockutils.base_test import SeleniumBaseTest
-from selenium.webdriver.support.ui import WebDriverWait
+from xblockutils.base_test import SeleniumBaseTest, SeleniumXBlockTest
+from xblockutils.resources import ResourceLoader
+
+loader = ResourceLoader(__name__)
+
+
+class MentoringTest(SeleniumXBlockTest):
+    """
+    The new base class for integration tests.
+    Scenarios can be loaded and edited on the fly.
+    """
+    default_css_selector = 'div.mentoring'
+
+    def load_scenario(self, xml_file, params=None, load_immediately=True):
+        """
+        Given the name of an XML file in the xml_templates folder, load it into the workbench.
+        """
+        params = params or {}
+        scenario = loader.render_template("xml_templates/{}".format(xml_file), params)
+        self.set_scenario_xml(scenario)
+        if load_immediately:
+            return self.go_to_view("student_view")
+
+    def click_submit(self, mentoring):
+        """ Click the submit button and wait for the response """
+        submit = mentoring.find_element_by_css_selector('.submit input.input-main')
+        self.assertTrue(submit.is_displayed())
+        self.assertTrue(submit.is_enabled())
+        submit.click()
+        self.wait_until_disabled(submit)
 
 
 class MentoringBaseTest(SeleniumBaseTest):
+    """
+    Old-style way of implementing Selenium integration tests.
+    Loads all scenarios from tests/integration/xml/ into the workbench.
+    """
     module_name = __name__
     default_css_selector = 'div.mentoring'
 
-    def wait_until_visible(self, elem):
-        wait = WebDriverWait(elem, self.timeout)
-        wait.until(lambda e: e.is_displayed(), u"{} should be hidden".format(elem.text))
-
     def popup_check(self, mentoring, item_feedbacks, do_submit=True):
+        """
+        Helper method for checking the tip popups given for a particular choice
+        """
         choices_list = mentoring.find_element_by_css_selector(".choices-list")
 
         submit = mentoring.find_element_by_css_selector('.submit input.input-main')
@@ -41,7 +75,8 @@ class MentoringBaseTest(SeleniumBaseTest):
         for index, expected_feedback in enumerate(item_feedbacks):
             choice_wrapper = choices_list.find_elements_by_css_selector(".choice")[index]
             if do_submit:
-                choice_wrapper.find_element_by_css_selector(".choice-selector input").click()  # clicking on actual radio button
+                # click on actual radio button:
+                choice_wrapper.find_element_by_css_selector(".choice-selector input").click()
                 submit.click()
             item_feedback_icon = choice_wrapper.find_element_by_css_selector(".choice-result")
             choice_wrapper.click()
