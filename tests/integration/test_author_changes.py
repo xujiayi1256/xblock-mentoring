@@ -3,6 +3,7 @@ If an author makes changes to the block after students have started using it, wi
 happen?
 """
 from .base_test import MentoringTest
+import ddt
 from .test_assessment import MentoringAssessmentBaseTest
 import re
 
@@ -13,7 +14,7 @@ class AuthorChangesTest(MentoringTest):
     """
     def setUp(self):
         super(AuthorChangesTest, self).setUp()
-        self.load_scenario("author_changes.xml", {"mode": "standard"}, load_immediately=False)
+        self.load_scenario("author_changes.xml", {"mode": "standard", "use_intro": False}, load_immediately=False)
         self.refresh_page()
 
     def refresh_page(self):
@@ -132,17 +133,20 @@ class AuthorChangesTest(MentoringTest):
         self.assertEqual(self.mentoring.score.percentage, 17)
 
 
+@ddt.ddt
 class AuthorChangesAssessmentTest(MentoringAssessmentBaseTest):
     """
     Test various scenarios involving author changes made to an assessment block already in use
     """
-    def test_delete_question(self):
+    @ddt.data(True, False)
+    def test_delete_question(self, use_intro):
         """ Test that the assessment behaves correctly when deleting a question. """
-        self.load_scenario("author_changes.xml", {"mode": "assessment"}, load_immediately=False)
+        self.load_scenario("author_changes.xml", {"mode": "assessment", "use_intro": use_intro}, load_immediately=False)
         mentoring, controls = self.go_to_assessment()
 
         # Answer each question, getting the first question wrong:
         self.answer_mcq(number=1, name="q1", value="no", mentoring=mentoring, controls=controls, is_last=False)
+        mentoring, controls = self.go_to_assessment()
         self.answer_mcq(number=2, name="q2", value="elegance", mentoring=mentoring, controls=controls, is_last=False)
 
         mentoring.find_element_by_css_selector('textarea').send_keys("Hello world")

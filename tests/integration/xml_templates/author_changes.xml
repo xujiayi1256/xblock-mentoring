@@ -1,6 +1,12 @@
 <vertical_demo>
     <mentoring url_name="mentoring1" enforce_dependency="false" mode="{{mode}}" max_attempts="2">
 
+        {% if use_intro %}
+        <html>
+            <p>This is text about the first question. This HTML node's presence affects the meaning of 'step'.</p>
+        </html>
+        {% endif %}
+
         <mcq name="q1" type="choices">
             <question>So, do you like this Q1?</question>
             <choice value="yes">Yes</choice>
