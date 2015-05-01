@@ -25,7 +25,7 @@ function MentoringAssessmentView(runtime, element, mentoring) {
 
     function no_more_attempts() {
         var attempts_data = $('.attempts', element).data();
-        return attempts_data.num_attempts >= attempts_data.max_attempts;
+        return (attempts_data.max_attempts > 0) && (attempts_data.num_attempts >= attempts_data.max_attempts);
     }
 
     function renderGrade() {

@@ -1,5 +1,5 @@
 <vertical_demo>
-    <mentoring url_name="mentoring1" enforce_dependency="false" mode="{{mode}}" max_attempts="2">
+    <mentoring url_name="mentoring1" enforce_dependency="false" mode="{{mode}}">
 
         {% if use_intro %}
         <html>
