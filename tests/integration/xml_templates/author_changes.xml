@@ -1,5 +1,5 @@
 <vertical_demo>
-    <mentoring url_name="mentoring1" enforce_dependency="false">
+    <mentoring url_name="mentoring1" enforce_dependency="false" mode="{{mode}}" max_attempts="2">
 
         <mcq name="q1" type="choices">
             <question>So, do you like this Q1?</question>

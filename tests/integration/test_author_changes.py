@@ -3,6 +3,7 @@ If an author makes changes to the block after students have started using it, wi
 happen?
 """
 from .base_test import MentoringTest
+from .test_assessment import MentoringAssessmentBaseTest
 import re
 
 
@@ -12,7 +13,7 @@ class AuthorChangesTest(MentoringTest):
     """
     def setUp(self):
         super(AuthorChangesTest, self).setUp()
-        self.load_scenario("author_changes.xml", load_immediately=False)
+        self.load_scenario("author_changes.xml", {"mode": "standard"}, load_immediately=False)
         self.refresh_page()
 
     def refresh_page(self):
@@ -129,3 +130,45 @@ class AuthorChangesTest(MentoringTest):
 
         # Now, the student's score should be 1 out of 6 (only q3 is correct):
         self.assertEqual(self.mentoring.score.percentage, 17)
+
+
+class AuthorChangesAssessmentTest(MentoringAssessmentBaseTest):
+    """
+    Test various scenarios involving author changes made to an assessment block already in use
+    """
+    def test_delete_question(self):
+        """ Test that the assessment behaves correctly when deleting a question. """
+        self.load_scenario("author_changes.xml", {"mode": "assessment"}, load_immediately=False)
+        mentoring, controls = self.go_to_assessment()
+
+        # Answer each question, getting the first question wrong:
+        self.answer_mcq(number=1, name="q1", value="no", mentoring=mentoring, controls=controls, is_last=False)
+        self.answer_mcq(number=2, name="q2", value="elegance", mentoring=mentoring, controls=controls, is_last=False)
+
+        mentoring.find_element_by_css_selector('textarea').send_keys("Hello world")
+        controls.submit.click()
+        self.wait_until_clickable(controls.review)
+        controls.review.click()
+        self.wait_until_hidden(controls.review)
+
+        # Delete question 3:
+        vertical = self.load_root_xblock()
+        block = vertical.runtime.get_block(vertical.children[0])
+        new_xml, changed = re.subn('<answer name="q3">.*</answer>', "", block.xml_content, flags=re.DOTALL)
+        self.assertEqual(changed, 1)
+        block.xml_content = new_xml
+        block.save()
+
+        mentoring, controls = self.go_to_assessment()
+
+        self.assertIn("You scored 50% on this assessment.", mentoring.text)
+        self.assertIn("You answered 1 questions correctly.", mentoring.text)
+        self.assertIn("You answered 1 questions incorrectly.", mentoring.text)
+
+        controls.try_again.click()
+        self.wait_until_hidden(controls.try_again)
+
+        # Now answer again, getting a perfect score:
+        self.answer_mcq(number=1, name="q1", value="yes", mentoring=mentoring, controls=controls, is_last=False)
+        self.answer_mcq(number=2, name="q2", value="elegance", mentoring=mentoring, controls=controls, is_last=True)
+        self.assertIn("You scored 100% on this assessment.", mentoring.text)
