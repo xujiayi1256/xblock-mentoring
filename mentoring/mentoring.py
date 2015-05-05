@@ -214,7 +214,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         self.migrate_fields()
 
         # Validate self.step:
-        num_steps = len(self.light_children)
+        num_steps = len([child for child in self.get_children_objects() if not isinstance(child, self.FLOATING_BLOCKS)])
         if self.step > num_steps:
             self.step = num_steps
 

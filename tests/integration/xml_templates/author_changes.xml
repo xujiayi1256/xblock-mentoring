@@ -27,5 +27,11 @@
             <question>What do you like about Q3?</question>
         </answer>
 
+        {% if use_message %}
+        <message type="on-assessment-review">
+            <html><p>Feedback here. This node may throw off the 'step' count.</p></html>
+        </message>
+        {% endif %}
+
     </mentoring>
 </vertical_demo>

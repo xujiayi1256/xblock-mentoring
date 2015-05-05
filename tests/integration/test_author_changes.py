@@ -139,9 +139,13 @@ class AuthorChangesAssessmentTest(MentoringAssessmentBaseTest):
     Test various scenarios involving author changes made to an assessment block already in use
     """
     @ddt.data(True, False)
-    def test_delete_question(self, use_intro):
+    def test_delete_question(self, use_extra_features):
         """ Test that the assessment behaves correctly when deleting a question. """
-        self.load_scenario("author_changes.xml", {"mode": "assessment", "use_intro": use_intro}, load_immediately=False)
+        self.load_scenario(
+            "author_changes.xml",
+            {"mode": "assessment", "use_intro": use_extra_features, "use_message": use_extra_features},
+            load_immediately=False
+        )
         mentoring, controls = self.go_to_assessment()
 
         # Answer each question, getting the first question wrong:
