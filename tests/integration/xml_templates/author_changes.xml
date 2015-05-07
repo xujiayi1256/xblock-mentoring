@@ -1,5 +1,11 @@
 <vertical_demo>
-    <mentoring url_name="mentoring1" enforce_dependency="false">
+    <mentoring url_name="mentoring1" enforce_dependency="false" mode="{{mode}}">
+
+        {% if use_intro %}
+        <html>
+            <p>This is text about the first question. This HTML node's presence affects the meaning of 'step'.</p>
+        </html>
+        {% endif %}
 
         <mcq name="q1" type="choices">
             <question>So, do you like this Q1?</question>
@@ -20,6 +26,12 @@
         <answer name="q3">
             <question>What do you like about Q3?</question>
         </answer>
+
+        {% if use_message %}
+        <message type="on-assessment-review">
+            <html><p>Feedback here. This node may throw off the 'step' count.</p></html>
+        </message>
+        {% endif %}
 
     </mentoring>
 </vertical_demo>

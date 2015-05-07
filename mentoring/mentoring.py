@@ -213,6 +213,11 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         # Migrate stored data if necessary
         self.migrate_fields()
 
+        # Validate self.step:
+        num_steps = len([child for child in self.get_children_objects() if not isinstance(child, self.FLOATING_BLOCKS)])
+        if self.step > num_steps:
+            self.step = num_steps
+
         fragment, named_children = self.get_children_fragment(
             context, view_name='mentoring_view',
             not_instance_of=self.FLOATING_BLOCKS,

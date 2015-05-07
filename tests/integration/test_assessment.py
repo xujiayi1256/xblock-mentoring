@@ -1,11 +1,10 @@
 from ddt import ddt, data, unpack
-from .base_test import MentoringBaseTest
+from .base_test import MentoringTest
 
 CORRECT, INCORRECT, PARTIAL = "correct", "incorrect", "partially-correct"
 
 
-@ddt
-class MentoringAssessmentTest(MentoringBaseTest):
+class MentoringAssessmentBaseTest(MentoringTest):
     def _selenium_bug_workaround_scroll_to(self, mentoring):
         """Workaround for selenium bug:
 
@@ -77,11 +76,8 @@ class MentoringAssessmentTest(MentoringBaseTest):
         for name, count in states.items():
             self.assertEqual(len(mentoring.find_elements_by_css_selector(".checkmark-{}".format(name))), count)
 
-    def go_to_workbench_main_page(self):
-        self.browser.get(self.live_server_url)
-
-    def go_to_assessment(self, number):
-        mentoring = self.go_to_page('Assessment %s' % number)
+    def go_to_assessment(self):
+        mentoring = self.go_to_view("student_view")
 
         class Namespace(object):
             pass
@@ -189,6 +185,16 @@ class MentoringAssessmentTest(MentoringBaseTest):
         self._assert_checkmark(mentoring, result)
 
         self.do_post(controls, last)
+
+    def answer_mcq(self, number, name, value, mentoring, controls, is_last=False):
+        """ More generic version of single_choice_question """
+        self.wait_until_text_in(self.question_text(number), mentoring)
+
+        mentoring.find_element_by_css_selector('input[name={}][value={}]'.format(name, value)).click()
+        self.selected_controls(controls, is_last)
+        controls.submit.click()
+        self.do_submit_wait(controls, is_last)
+        self.do_post(controls, is_last)
 
     def rating_question(self, number, mentoring, controls, choice_name, result, last=False):
         self.wait_until_text_in(self.question_text(number), mentoring)
@@ -327,10 +333,13 @@ class MentoringAssessmentTest(MentoringBaseTest):
         self.peek_at_multiple_response_question(4, mentoring, controls, extended_feedback=True, alternative_review=True)
 
 
-    @data((1, False), ('Extended Feedback', True))
+@ddt
+class MentoringAssessmentTest(MentoringAssessmentBaseTest):
+    @data((1, False), ('extended_feedback', True))
     @unpack
     def test_assessment(self, assessment, extended_feedback):
-        mentoring, controls = self.go_to_assessment(assessment)
+        self.load_scenario("assessment_{}.xml".format(assessment), load_immediately=False)
+        mentoring, controls = self.go_to_assessment()
 
         self.freeform_answer(1, mentoring, controls, 'This is the answer', CORRECT)
         self.single_choice_question(2, mentoring, controls, 'Maybe not', INCORRECT)
@@ -338,8 +347,7 @@ class MentoringAssessmentTest(MentoringBaseTest):
         self.peek_at_multiple_response_question(4, mentoring, controls, last=True)
 
         # see if assessment remembers the current step
-        self.go_to_workbench_main_page()
-        mentoring, controls = self.go_to_assessment(assessment)
+        mentoring, controls = self.go_to_assessment()
 
         self.multiple_response_question(4, mentoring, controls, ("Its beauty",), PARTIAL, last=True)
 
@@ -373,7 +381,8 @@ class MentoringAssessmentTest(MentoringBaseTest):
         """
         No 'Next Question' button on single question assessment.
         """
-        mentoring, controls = self.go_to_assessment(2)
+        self.load_scenario("assessment_2.xml", load_immediately=False)
+        mentoring, controls = self.go_to_assessment()
         self.single_choice_question(0, mentoring, controls, 'Maybe not', INCORRECT, last=True)
 
         expected_results = {
