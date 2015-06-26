@@ -107,7 +107,13 @@ class LightChildrenMixin(XBlockWithChildrenFragmentsMixin):
             cls.add_node_as_child(block, xml_child, child_id)
 
         for name, value in attr:
-            setattr(block, name, value)
+            try:
+                setattr(block, name, value)
+            except AttributeError:
+                # URL name is handled in a special manner, depending on the runtime.
+                if name == 'url_name':
+                    continue
+                raise
 
         return block
 
