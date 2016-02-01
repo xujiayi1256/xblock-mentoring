@@ -159,7 +159,8 @@ class MentoringAssessmentBaseTest(MentoringTest):
         else:
             controls.next_question.click()
 
-    def single_choice_question(self, number, mentoring, controls, choice_name, result, last=False):
+    def just_select_on_a_single_choice_question(
+            self, number, mentoring, controls, choice_name, last=False):
         self.wait_until_text_in(self.question_text(number), mentoring)
         self.assert_persistent_elements_present(mentoring)
         self._selenium_bug_workaround_scroll_to(mentoring)
@@ -179,12 +180,23 @@ class MentoringAssessmentBaseTest(MentoringTest):
 
         self.selected_controls(controls, last)
 
-        controls.submit.click()
+    def wait_for_and_check_single_choice_question_result(self, mentoring, controls, result, last=False):
 
         self.do_submit_wait(controls, last)
         self._assert_checkmark(mentoring, result)
 
         self.do_post(controls, last)
+
+    def single_choice_question(self, number, mentoring, controls, choice_name, result, last=False):
+
+        self.just_select_on_a_single_choice_question(
+                number, mentoring, controls, choice_name, last)
+
+        controls.submit.click()
+
+        self.wait_for_and_check_single_choice_question_result(
+                mentoring, controls, result, last)
+
 
     def answer_mcq(self, number, name, value, mentoring, controls, is_last=False):
         """ More generic version of single_choice_question """
@@ -335,6 +347,7 @@ class MentoringAssessmentBaseTest(MentoringTest):
 
 @ddt
 class MentoringAssessmentTest(MentoringAssessmentBaseTest):
+
     @data((1, False), ('extended_feedback', True))
     @unpack
     def test_assessment(self, assessment, extended_feedback):
@@ -396,3 +409,44 @@ class MentoringAssessmentTest(MentoringAssessmentBaseTest):
         # this is a wait and assertion all together - it waits until expected text is in mentoring block
         # and it fails with PrmoiseFailed exception if it's not
         self.wait_until_text_in(self.question_text(0), mentoring)
+
+    def test_double_click_results_in_a_checkmark(self):
+        """
+        Double click on submit when selecting a proper response results in a green checkmark.
+        """
+        self.load_scenario("assessment_2.xml", load_immediately=False)
+        mentoring, controls = self.go_to_assessment()
+
+        self.just_select_on_a_single_choice_question(
+                0, mentoring, controls, "Yes", True)
+
+        controls.submit.click()
+        controls.submit.click()
+
+        self.wait_for_and_check_single_choice_question_result(
+                mentoring, controls, CORRECT, True)
+
+    def test_double_click_uses_only_a_single_attempt(self):
+        """
+        Double click on submit when selecting a wrong response uses only
+        a single attempt
+        """
+        self.load_scenario("assessment_2.xml", load_immediately=False)
+        mentoring, controls = self.go_to_assessment()
+
+        self.just_select_on_a_single_choice_question(
+                0, mentoring, controls, "Maybe not", True)
+
+        controls.submit.click()
+        controls.submit.click()
+
+        self.do_submit_wait(controls, True)
+
+        self.do_post(controls, True)
+
+        expected_results = {
+            "correct": 0, "partial": 0, "incorrect": 1, "percentage": 0,
+            "num_attempts": 1, "max_attempts": 2}
+
+        self.peek_at_review(mentoring, controls, expected_results)
+        self.assert_messages_empty(mentoring)
