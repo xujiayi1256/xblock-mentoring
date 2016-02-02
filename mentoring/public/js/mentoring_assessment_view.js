@@ -298,7 +298,8 @@ function MentoringAssessmentView(runtime, element, mentoring) {
     }
 
     function submit() {
-        calculate_results('submit', handleSubmitResults)
+        submitDOM.attr('disabled', 'disabled');
+        calculate_results('submit', handleSubmitResults);
     }
 
     function get_results() {
