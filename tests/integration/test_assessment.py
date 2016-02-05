@@ -426,6 +426,23 @@ class MentoringAssessmentTest(MentoringAssessmentBaseTest):
         self.wait_for_and_check_single_choice_question_result(
                 mentoring, controls, CORRECT, True)
 
+    def test_unblock_submit_on_error(self):
+        """
+        Test button is re-enabled after an ajax error.
+        """
+
+        self.load_scenario("assessment_2.xml", load_immediately=False)
+        mentoring, controls = self.go_to_assessment()
+
+        self.just_select_on_a_single_choice_question(
+                0, mentoring, controls, "Yes", True)
+        self.timeout = 20
+        with self.settings(ROOT_URLCONF='integration.urls_for_reenable_submit_test'):
+            controls.submit.click()
+            self.wait_until_disabled(controls.submit)
+            enabled_button_selector = '{} .submit input:not([disabled]).input-main'
+            self.wait_until_exists(enabled_button_selector.format(self.default_css_selector))
+
     def test_double_click_uses_only_a_single_attempt(self):
         """
         Double click on submit when selecting a wrong response uses only
