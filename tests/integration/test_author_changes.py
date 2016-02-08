@@ -2,16 +2,17 @@
 If an author makes changes to the block after students have started using it, will bad things
 happen?
 """
+
 from .base_test import MentoringTest
 import ddt
 from .test_assessment import MentoringAssessmentBaseTest
 import re
 
-
 class AuthorChangesTest(MentoringTest):
     """
     Test various scenarios involving author changes made to a block already in use by students
     """
+
     def setUp(self):
         super(AuthorChangesTest, self).setUp()
         self.load_scenario("author_changes.xml", {"mode": "standard", "use_intro": False}, load_immediately=False)
@@ -30,6 +31,7 @@ class AuthorChangesTest(MentoringTest):
         """
         vertical = self.load_root_xblock()
         self.mentoring = vertical.runtime.get_block(vertical.children[0])
+        self.wait_until_text_in("QUESTION", self.mentoring_dom)
 
     def submit_answers(self, q1_answer='yes', q2_answer='elegance', q3_answer="It's boring."):
         """ Answer all three questions in the 'author_changes.xml' scenario correctly """

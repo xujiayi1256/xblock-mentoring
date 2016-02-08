@@ -24,8 +24,8 @@ class MentoringAssessmentBaseTest(MentoringTest):
         """
         controls = mentoring.find_element_by_css_selector("div.submit")
         title = mentoring.find_element_by_css_selector("h3.question-title")
-        controls.click()
-        title.click()
+        self.scroll_to(controls)
+        self.scroll_to(title)
 
     def assert_hidden(self, elem):
         self.assertFalse(elem.is_displayed())
