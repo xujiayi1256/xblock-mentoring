@@ -27,6 +27,7 @@ import json
 import logging
 import uuid
 import re
+import textwrap
 
 from collections import namedtuple
 
@@ -50,20 +51,68 @@ from .utils import loader
 log = logging.getLogger(__name__)
 
 
-def _default_xml_content():
-    return loader.render_template(
-        'templates/xml/mentoring_default.xml',
-        {'url_name': 'mentoring-{}'.format(uuid.uuid4())})
+DEFAULT_XML_CONTENT = textwrap.dedent("""
+<mentoring url_name="{url_name}" display_name="Nav tooltip title" weight="1" mode="standard">
+    <title>Default Title</title>
+    <html>
+        <p>Please answer the questions below.</p>
+    </html>
+
+    <answer name="goal">
+        <question>What is your goal?</question>
+    </answer>
+
+    <mcq name="mcq_1_1" type="choices">
+        <question>Do you like this MCQ?</question>
+        <choice value="yes">Yes</choice>
+        <choice value="maybenot">Maybe not</choice>
+        <choice value="understand">I don't understand</choice>
+
+        <tip display="yes">Great!</tip>
+        <tip reject="maybenot">Ah, damn.</tip>
+        <tip reject="understand"><html><div id="test-custom-html">Really?</div></html></tip>
+    </mcq>
+
+    <mcq name="mcq_1_2" type="rating" low="Not good at all" high="Extremely good">
+        <question>How much do you rate this MCQ?</question>
+        <choice value="notwant">I don't want to rate it</choice>
+
+        <tip display="4,5">I love good grades.</tip>
+        <tip reject="1,2,3">Will do better next time...</tip>
+        <tip reject="notwant">Your loss!</tip>
+    </mcq>
+
+    <mrq name="mrq_1_3" type="choices">
+        <question>What do you like in this MRQ?</question>
+        <choice value="elegance">Its elegance</choice>
+        <choice value="beauty">Its beauty</choice>
+        <choice value="gracefulness">Its gracefulness</choice>
+        <choice value="bugs">Its bugs</choice>
+
+        <tip require="gracefulness">This MRQ is indeed very graceful</tip>
+        <tip require="elegance,beauty">This is something everyone has to like about this MRQ</tip>
+        <tip reject="bugs">Nah, there aren't any!</tip>
+
+        <message type="on-submit">Thank you for answering!</message>
+    </mrq>
+
+    <message type="completed">
+        <html><p>Congratulations!</p></html>
+    </message>
+    <message type="incomplete">
+        <html><p>Still some work to do...</p></html>
+    </message>
+</mentoring>
+""").format(url_name='mentoring-{}'.format(uuid.uuid4()))
 
 
 def _is_default_xml_content(value):
     UUID_PATTERN = '[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}'
     DUMMY_UUID = '12345678-1234-1234-1234-123456789abc'
-
-    if value is _default_xml_content:
+    if value is DEFAULT_XML_CONTENT:
         return True
 
-    expected = _default_xml_content()
+    expected = DEFAULT_XML_CONTENT
 
     expected = re.sub(UUID_PATTERN, DUMMY_UUID, expected)
     value = re.sub(UUID_PATTERN, DUMMY_UUID, value)
@@ -108,7 +157,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
                                  default=False, scope=Scope.content, enforce_type=True)
     display_submit = Boolean(help="Allow submission of the current block?", default=True,
                              scope=Scope.content, enforce_type=True)
-    xml_content = String(help="XML content", default=_default_xml_content, scope=Scope.content)
+    xml_content = String(help="XML content", default=DEFAULT_XML_CONTENT, scope=Scope.content)
     weight = Float(help="Defines the maximum total grade of the block.",
                    default=1, scope=Scope.content, enforce_type=True)
     num_attempts = Integer(help="Number of attempts a user has answered for this questions",
