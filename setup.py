@@ -65,7 +65,7 @@ BLOCKS_CHILDREN = [
 
 setup(
     name='xblock-mentoring',
-    version='0.1',
+    version='0.2',
     description='XBlock - Mentoring',
     packages=['mentoring', 'mentoring.migrations'],
     install_requires=[
