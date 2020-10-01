@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -22,16 +21,11 @@
 #
 
 import logging
-import os
-import pkg_resources
+from io import BytesIO as StringIO
+
 import unicodecsv
-
-from cStringIO import StringIO
-from django.template import Context, Template
 from xblock.fragment import Fragment
-
 from xblockutils.resources import ResourceLoader
-
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +49,7 @@ def list2csv(row):
     return f.read()
 
 
-class XBlockWithChildrenFragmentsMixin(object):
+class XBlockWithChildrenFragmentsMixin:
     def get_children_fragment(self, context, view_name='student_view', instance_of=None,
                               not_instance_of=None):
         """
@@ -86,10 +80,10 @@ class XBlockWithChildrenFragmentsMixin(object):
         Returns a fragment with the content of all the children's content, concatenated
         """
         fragment, named_children = self.get_children_fragment(context)
-        for name, child_fragment in named_children:
+        for _, child_fragment in named_children:
             fragment.add_content(child_fragment.content)
         return fragment
 
 
-class ContextConstants(object):
+class ContextConstants:
     AS_TEMPLATE = 'as_template'

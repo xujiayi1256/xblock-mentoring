@@ -1,9 +1,13 @@
 import unittest
+import pytest
+
 from mock import MagicMock, Mock, patch
 from xblock.field_data import DictFieldData
-from mentoring import MentoringBlock
+
+from mentoring.mentoring import MentoringBlock
 
 
+@pytest.mark.django_db
 class TestMentoringBlock(unittest.TestCase):
     def test_sends_progress_event_when_rendered_student_view_with_display_submit_false(self):
         block = MentoringBlock(MagicMock(), DictFieldData({

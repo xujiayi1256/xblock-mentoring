@@ -1,9 +1,10 @@
 import unittest
-from mock import MagicMock, Mock
 
+from mock import MagicMock, Mock
 from xblock.field_data import DictFieldData
 
-from mentoring import MentoringBlock, MCQBlock
+from mentoring.mentoring import MentoringBlock
+from mentoring.mcq import MCQBlock
 
 
 class TestMCQBlock(unittest.TestCase):
@@ -12,7 +13,7 @@ class TestMCQBlock(unittest.TestCase):
         mcq1 = MCQBlock(block)
         uuid1 = mcq1.uuid
         # Doesn't change during objects lifetime.
-        self.assertEquals(mcq1.uuid, uuid1)
+        self.assertEqual(mcq1.uuid, uuid1)
         # Different instance returns a different uuid.
         mcq2 = MCQBlock(block)
-        self.assertNotEquals(mcq2.uuid, uuid1)
+        self.assertNotEqual(mcq2.uuid, uuid1)

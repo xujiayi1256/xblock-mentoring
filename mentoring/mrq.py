@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 edX
 #
@@ -25,11 +24,9 @@
 
 import logging
 
-
-from .light_children import List, Scope, Boolean
+from .light_children import Boolean, List, Scope
 from .questionnaire import QuestionnaireAbstractBlock
 from .utils import loader
-
 
 # Globals ###########################################################
 
@@ -46,12 +43,12 @@ class MRQBlock(QuestionnaireAbstractBlock):
     hide_results = Boolean(help="Hide results", scope=Scope.content, default=False)
 
     def submit(self, submissions):
-        log.debug(u'Received MRQ submissions: "%s"', submissions)
+        log.debug('Received MRQ submissions: "%s"', submissions)
 
         result = self.calculate_results(submissions)
         self.student_choices = submissions
 
-        log.debug(u'MRQ submissions result: %s', result)
+        log.debug('MRQ submissions result: %s', result)
         return result
 
     def get_results(self, previous_result):

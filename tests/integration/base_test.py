@@ -30,7 +30,7 @@ from xblockutils.resources import ResourceLoader
 loader = ResourceLoader(__name__)
 
 
-class ScrollToMixin(object):
+class ScrollToMixin():
 
     def scroll_to(self, component, offset=0):
         """
@@ -40,8 +40,8 @@ class ScrollToMixin(object):
         :return:
         """
         self.driver.execute_script(
-                "return window.scrollTo(0, arguments[0]);",
-                component.location['y']+offset)
+            "return window.scrollTo(0, arguments[0]);",
+            component.location['y']+offset)
 
 
 class PopupCheckMixin(ScrollToMixin):
@@ -88,7 +88,7 @@ class MentoringTest(SeleniumXBlockTest, PopupCheckMixin):
     """
     default_css_selector = 'div.mentoring'
 
-    def load_scenario(self, xml_file, params=None, load_immediately=True):
+    def load_scenario(self, xml_file, params=None, load_immediately=True): # pylint: disable=R1710
         """
         Given the name of an XML file in the xml_templates folder, load it into the workbench.
         """

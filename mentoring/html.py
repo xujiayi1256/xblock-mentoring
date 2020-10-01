@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -26,12 +25,9 @@
 import logging
 
 from lxml import etree
-
 from xblock.fragment import Fragment
 
 from .light_children import LightChild, Scope, String
-
-
 # Globals ###########################################################
 from .utils import ContextConstants
 
@@ -53,7 +49,7 @@ class HTMLBlock(LightChild):
         node.tag = 'div'
         node_classes = (cls for cls in [node.get('class', ''), 'html_child'] if cls)
         node.set('class', " ".join(node_classes))
-        block.content = unicode(etree.tostring(node))
+        block.content = etree.tostring(node, encoding='unicode')
         node.tag = 'html'
 
         return block
@@ -61,14 +57,12 @@ class HTMLBlock(LightChild):
     def student_view(self, context=None):
         as_template = context.get(ContextConstants.AS_TEMPLATE, True) if context is not None else True
         if as_template:
-            return Fragment(u"<script type='text/template' id='{}'>\n{}\n</script>".format(
+            return Fragment("<script type='text/template' id='{}'>\n{}\n</script>".format(
                 'light-child-template',
                 self.content
             ))
 
-        # bug? got AssertionError if I don't use unicode here. (assert isinstance(content, unicode))
-        # Although it is set when constructed?
-        return Fragment(unicode(self.content))
+        return Fragment(str(self.content))
 
     def mentoring_view(self, context=None):
         return self.student_view(context)

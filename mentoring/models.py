@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -25,8 +24,8 @@
 
 from django.db import models
 
-
 # Classes ###########################################################
+
 
 class Answer(models.Model):
     """
@@ -48,7 +47,7 @@ class Answer(models.Model):
     def save(self, *args, **kwargs):
         # Force validation of max_length
         self.full_clean()
-        super(Answer, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class LightChild(models.Model):

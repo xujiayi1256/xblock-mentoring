@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -25,26 +24,23 @@
 
 import json
 import logging
-import uuid
 import re
 import textwrap
-
+import uuid
 from collections import namedtuple
+from io import StringIO
 
 from lxml import etree
-from StringIO import StringIO
-
 from xblock.core import XBlock
-from xblock.fields import Boolean, Scope, String, Integer, Float, List
+from xblock.fields import Boolean, Float, Integer, List, Scope, String
 from xblock.fragment import Fragment
 
-from .light_children import XBlockWithLightChildren
-from .title import TitleBlock
 from .header import SharedHeaderBlock
+from .light_children import XBlockWithLightChildren
 from .message import MentoringMessageBlock
 from .step import StepParentMixin
+from .title import TitleBlock
 from .utils import loader
-
 
 # Globals ###########################################################
 
@@ -406,7 +402,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
 
     @XBlock.json_handler
     def submit(self, submissions, suffix=''):
-        log.info(u'Received submissions: {}'.format(submissions))
+        log.info('Received submissions: {}'.format(submissions))
         self.attempted = True
 
         if self.is_assessment:
@@ -508,7 +504,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
         score = self.score
 
         if current_child == self.steps[-1]:
-            log.info(u'Last assessment step submitted: {}'.format(submissions))
+            log.info('Last assessment step submitted: {}'.format(submissions))
             if not self.max_attempts_reached:
                 self.runtime.publish(self, 'grade', {
                     'value': score.raw,
@@ -601,7 +597,7 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
 
     @XBlock.json_handler
     def studio_submit(self, submissions, suffix=''):
-        log.info(u'Received studio submissions: {}'.format(submissions))
+        log.info('Received studio submissions: {}'.format(submissions))
 
         xml_content = submissions['xml_content']
         try:
@@ -630,9 +626,9 @@ class MentoringBlock(XBlockWithLightChildren, StepParentMixin):
                 response = {
                     'result': 'success',
                 }
-                self.xml_content = etree.tostring(content, pretty_print=True)
+                self.xml_content = etree.tostring(content, encoding='unicode', pretty_print=True)
 
-        log.debug(u'Response from Studio: {}'.format(response))
+        log.debug('Response from Studio: {}'.format(response))
         return response
 
     @property
