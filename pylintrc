@@ -25,7 +25,10 @@ disable=
     too-many-ancestors,
     too-many-arguments,
     too-many-locals,
-    unused-argument
+    unused-argument,
+    missing-function-docstring,
+    missing-module-docstring,
+    missing-class-docstring
 
 [SIMILARITIES]
 min-similarity-lines=6

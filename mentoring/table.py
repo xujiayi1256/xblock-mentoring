@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -31,7 +30,6 @@ from xblock.fields import Scope
 from .light_children import LightChild, String
 from .utils import loader
 
-
 # Globals ###########################################################
 
 log = logging.getLogger(__name__)
@@ -51,7 +49,7 @@ class MentoringTableBlock(LightChild):
 
     def student_view(self, context):
         fragment, columns_frags = self.get_children_fragment(context, view_name='mentoring_table_view')
-        f, header_frags = self.get_children_fragment(context, view_name='mentoring_table_header_view')
+        _, header_frags = self.get_children_fragment(context, view_name='mentoring_table_header_view')
 
         bg_image_url = self.runtime.local_resource_url(self.xblock_container,
                                                        'public/img/{}-bg.png'.format(self.type))
@@ -59,7 +57,7 @@ class MentoringTableBlock(LightChild):
         # Load an optional description for the background image, for accessibility
         try:
             bg_image_description = loader.load_unicode('static/text/table-{}.txt'.format(self.type))
-        except IOError as e:
+        except OSError as e:
             if e.errno == errno.ENOENT:
                 bg_image_description = ''
             else:
@@ -128,6 +126,6 @@ class MentoringTableColumnHeaderBlock(LightChild):
     content = String(help="Body of the header", scope=Scope.content, default='')
 
     def mentoring_table_header_view(self, context):
-        fragment = super(MentoringTableColumnHeaderBlock, self).children_view(context)
-        fragment.add_content(unicode(self.content))
+        fragment = super().children_view(context)
+        fragment.add_content(str(self.content))
         return fragment

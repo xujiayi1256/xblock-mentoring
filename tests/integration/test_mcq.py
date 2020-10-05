@@ -54,7 +54,7 @@ class MCQBlockTest(MentoringBaseTest):
         self.assertEqual(messages.text, '')
         self.assertFalse(messages.find_elements_by_xpath('./*'))
 
-    def test_mcq_choices_rating(self):
+    def test_mcq_choices_rating(self): # pylint: disable=too-many-statements
         """
         Mentoring MCQ should display tips according to user choice
         """

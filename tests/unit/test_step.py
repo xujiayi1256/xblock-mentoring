@@ -1,10 +1,10 @@
 import copy
 import unittest
-from mock import MagicMock, Mock
 
+from mock import MagicMock, Mock
 from xblock.field_data import DictFieldData
 
-from mentoring import MentoringBlock
+from mentoring.mentoring import MentoringBlock
 from mentoring.step import StepMixin, StepParentMixin
 
 
@@ -26,7 +26,7 @@ class Step(StepMixin):
         pass
 
 
-class NotAStep(object):
+class NotAStep():
     pass
 
 
@@ -52,8 +52,8 @@ class TestStepMixin(unittest.TestCase):
         step2 = Step()
         block._set_children_for_test(step1, 1, "2", "Step", NotAStep(), False, step2, NotAStep())
 
-        self.assertEquals(step1.step_number, 1)
-        self.assertEquals(step2.step_number, 2)
+        self.assertEqual(step1.step_number, 1)
+        self.assertEqual(step2.step_number, 2)
 
     def test_the_number_does_not_represent_the_order_of_creation(self):
         block = Parent()
@@ -61,8 +61,8 @@ class TestStepMixin(unittest.TestCase):
         step2 = Step()
         block._set_children_for_test(step2, 1, "2", "Step", NotAStep(), False, step1, NotAStep())
 
-        self.assertEquals(step1.step_number, 2)
-        self.assertEquals(step2.step_number, 1)
+        self.assertEqual(step1.step_number, 2)
+        self.assertEqual(step2.step_number, 1)
 
     def test_lonely_step_is_true_for_stand_alone_steps(self):
         block = Parent()
@@ -92,16 +92,16 @@ class TestFieldMigration(unittest.TestCase):
         """
         # Instantiate a mentoring block with the old format
         student_results = [
-            [ u'goal',
-                {   u'completed': True,
-                    u'score': 1,
-                    u'student_input': u'test',
-                    u'weight': 1}],
-            [ u'mcq_1_1',
-                {   u'completed': False,
-                    u'score': 0,
-                    u'submission': u'maybenot',
-                    u'weight': 1}],
+            [u'goal',
+             {u'completed': True,
+              u'score': 1,
+              u'student_input': u'test',
+              u'weight': 1}],
+            [u'mcq_1_1',
+             {u'completed': False,
+              u'score': 0,
+              u'submission': u'maybenot',
+              u'weight': 1}],
         ]
         mentoring = MentoringBlock(MagicMock(), DictFieldData({'student_results': student_results}), Mock())
         self.assertEqual(copy.deepcopy(student_results), mentoring.student_results)

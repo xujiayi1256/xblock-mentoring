@@ -44,7 +44,7 @@ class MentoringProgressionTest(MentoringBaseTest):
         for elem in mentoring.find_elements_by_css_selector('.warning'):
             self.assertFalse(elem.is_displayed())
 
-    def test_progression(self):
+    def test_progression(self):  # pylint: disable=too-many-statements
         """
         Mentoring blocks after the current step in the workflow should redirect user to current step
         """

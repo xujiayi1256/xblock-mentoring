@@ -1,4 +1,4 @@
-class StepParentMixin(object):
+class StepParentMixin:
     """
     A parent containing the Step objects
 
@@ -10,7 +10,7 @@ class StepParentMixin(object):
         return [child for child in self.get_children_objects() if isinstance(child, StepMixin)]
 
 
-class StepMixin(object):
+class StepMixin:
     @property
     def step_number(self):
         return self.parent.steps.index(self) + 1

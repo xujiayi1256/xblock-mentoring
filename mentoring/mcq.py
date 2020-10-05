@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -25,11 +24,9 @@
 
 import logging
 
-
 from .light_children import Scope, String
 from .questionnaire import QuestionnaireAbstractBlock
 from .utils import loader
-
 
 # Globals ###########################################################
 
@@ -50,11 +47,11 @@ class MCQBlock(QuestionnaireAbstractBlock):
     valid_types = ('rating', 'choices')
 
     def submit(self, submission):
-        log.debug(u'Received MCQ submission: "%s"', submission)
+        log.debug('Received MCQ submission: "%s"', submission)
         result = self.calculate_results(submission)
         self.student_choice = submission
         self.save()
-        log.debug(u'MCQ submission result: %s', result)
+        log.debug('MCQ submission result: %s', result)
         return result
 
     def get_results(self, previous_result):
