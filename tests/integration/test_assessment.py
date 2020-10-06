@@ -90,7 +90,7 @@ class MentoringAssessmentBaseTest(MentoringTest):
 
     @staticmethod
     def question_text(number):
-        if number:  # pylint: disable=no-else-return
+        if number:
             return "QUESTION %s" % number
         else:
             return "QUESTION"
@@ -361,7 +361,7 @@ class MentoringAssessmentTest(MentoringAssessmentBaseTest):
         self.multiple_response_question(4, mentoring, controls, ("Its beauty",), PARTIAL, last=True)
 
         expected_results = {
-            "correct": 2, "partial": 1, "incorrect": 1, "percentage": 63,
+            "correct": 2, "partial": 1, "incorrect": 1, "percentage": 62,
             "num_attempts": 1, "max_attempts": 2}
         self.peek_at_review(mentoring, controls, expected_results, extended_feedback=extended_feedback)
         self.assert_messages_text(mentoring, "Assessment additional feedback message text")

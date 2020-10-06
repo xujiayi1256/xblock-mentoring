@@ -8,3 +8,4 @@ pytest-cov==2.8.1
 pytest-django==3.7.0
 selenium==3.14.0
 xblock-sdk==0.2.2
+pypng==0.0.20

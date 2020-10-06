@@ -39,7 +39,7 @@ from .models import LightChild as LightChildModel
 from .utils import XBlockWithChildrenFragmentsMixin
 
 try:
-    from xmodule_modifiers import replace_jump_to_id_urls
+    from xmodule_modifiers import replace_jump_to_id_urls  # pylint: disable=import-error
 except Exception:
     # TODO-WORKBENCH-WORKAROUND: To allow to load from the workbench
     def replace_jump_to_id_urls(a, b, c, d, frag, f):
@@ -256,7 +256,7 @@ class LightChild(Plugin, LightChildrenMixin):
         return xmodule_runtime
 
     @lazy
-    def student_data(self):
+    def student_data(self):  # pylint: disable=method-hidden
         """
         Use lazy property instead of XBlock field, as __init__() doesn't support
         overwriting field values
@@ -387,7 +387,7 @@ class Boolean(LightChildField):
         self.default = kwargs.get('default', False)
 
     def __set__(self, instance, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             value = value.lower() == 'true'
 
         self.data[instance] = value

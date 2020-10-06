@@ -31,7 +31,7 @@ log = logging.getLogger(__name__)
 
 
 class MentoringResourceLoader(ResourceLoader):
-    def custom_render_js_template(self, template_path, context={}):
+    def custom_render_js_template(self, template_path, context=None):
         return self.render_js_template(template_path, 'light-child-template', context)
 
 
