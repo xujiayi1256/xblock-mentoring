@@ -23,12 +23,24 @@
 
 # Imports ###########################################################
 
+import urllib
 from .base_test import MentoringBaseTest
 
 
 # Classes ###########################################################
 
 class MentoringProgressionTest(MentoringBaseTest):
+
+    def get_base_url(self, url):
+        """
+        Extract base url from the given url
+
+        :param url: to extract base url from
+        :return: string - base url
+        """
+
+        parsed_url = urllib.parse.urlparse(url)
+        return '{url.scheme}://{url.netloc}'.format(url=parsed_url)
 
     def assert_warning(self, warning_dom, link_href):
         """
@@ -37,7 +49,8 @@ class MentoringProgressionTest(MentoringBaseTest):
         """
         self.assertEqual(warning_dom.text, 'You need to complete the previous step before attempting this step.')
         warning_link = warning_dom.find_element_by_xpath('./*')
-        link_href = 'http://localhost:8081{}'.format(link_href)
+        base_url = self.get_base_url(self.browser.current_url)
+        link_href = '{}{}'.format(base_url, link_href)
         self.assertEqual(warning_link.get_attribute('href'), link_href)
 
     def assert_warning_is_hidden(self, mentoring):

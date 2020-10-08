@@ -28,7 +28,10 @@ disable=
     unused-argument,
     missing-function-docstring,
     missing-module-docstring,
-    missing-class-docstring
+    missing-class-docstring,
+    no-else-return,
+    inconsistent-return-statements,
+    logging-format-interpolation
 
 [SIMILARITIES]
 min-similarity-lines=6
