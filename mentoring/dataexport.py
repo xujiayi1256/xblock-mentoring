@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -24,16 +23,15 @@
 # Imports ###########################################################
 
 import logging
-
 from itertools import groupby
+
 from webob import Response
 from xblock.core import XBlock
-from xblock.fields import String, Scope
+from xblock.fields import Scope, String
 from xblock.fragment import Fragment
 
 from .models import Answer
 from .utils import list2csv, loader
-
 
 # Globals ###########################################################
 
@@ -63,7 +61,7 @@ class MentoringDataExportBlock(XBlock):
         return fragment
 
     def studio_view(self, context):
-        return Fragment(u'Studio view body')
+        return Fragment('Studio view body')
 
     @XBlock.handler
     def download_csv(self, request, suffix=''):
@@ -79,10 +77,10 @@ class MentoringDataExportBlock(XBlock):
         answers_names = answers.values_list('name', flat=True).distinct().order_by('name')
 
         # Header line
-        yield list2csv([u'student_id'] + list(answers_names))
+        yield list2csv(['student_id'] + list(answers_names))
 
         if answers_names:
-            for k, student_answers in groupby(answers, lambda x: x.student_id):
+            for _, student_answers in groupby(answers, lambda x: x.student_id):
                 row = []
                 next_answer_idx = 0
                 for answer in student_answers:

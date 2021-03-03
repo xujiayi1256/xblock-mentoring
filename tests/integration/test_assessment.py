@@ -42,11 +42,8 @@ class MentoringAssessmentBaseTest(MentoringTest):
         self.assertIn("A Simple Assessment", mentoring.text)
         self.assertIn("This paragraph is shared between all questions.", mentoring.text)
 
-    def assert_disabled(self, elem):
-        self.assertTrue(elem.is_displayed())
-        self.assertFalse(elem.is_enabled())
 
-    class _GetChoices(object):
+    class _GetChoices():
         def __init__(self, mentoring, selector=".choices"):
             self._mcq = mentoring.find_element_by_css_selector(selector)
 
@@ -61,7 +58,6 @@ class MentoringAssessmentBaseTest(MentoringTest):
                 for choice in self._mcq.find_elements_by_css_selector(".choice")}
 
         def select(self, text):
-            state = {}
             for choice in self._mcq.find_elements_by_css_selector(".choice"):
                 if choice.text == text:
                     choice.find_element_by_css_selector("input").click()
@@ -79,7 +75,7 @@ class MentoringAssessmentBaseTest(MentoringTest):
     def go_to_assessment(self):
         mentoring = self.go_to_view("student_view")
 
-        class Namespace(object):
+        class Namespace():
             pass
 
         controls = Namespace()
@@ -110,14 +106,14 @@ class MentoringAssessmentBaseTest(MentoringTest):
         self.assertIn(self.question_text(number), mentoring.text)
         self.assertIn("What is your goal?", mentoring.text)
 
-        self.assertEquals(saved_value, answer.get_attribute("value"))
+        self.assertEqual(saved_value, answer.get_attribute("value"))
         if not saved_value:
             self.assert_disabled(controls.submit)
         self.assert_disabled(controls.next_question)
 
         answer.clear()
         answer.send_keys(text_input)
-        self.assertEquals(text_input, answer.get_attribute("value"))
+        self.assertEqual(text_input, answer.get_attribute("value"))
 
         self.assert_clickable(controls.submit)
         self.ending_controls(controls, last)
@@ -172,11 +168,11 @@ class MentoringAssessmentBaseTest(MentoringTest):
 
         choices = self._GetChoices(mentoring)
         expected_state = {"Yes": False, "Maybe not": False, "I don't understand": False}
-        self.assertEquals(choices.state, expected_state)
+        self.assertEqual(choices.state, expected_state)
 
         choices.select(choice_name)
         expected_state[choice_name] = True
-        self.assertEquals(choices.state, expected_state)
+        self.assertEqual(choices.state, expected_state)
 
         self.selected_controls(controls, last)
 
@@ -190,12 +186,12 @@ class MentoringAssessmentBaseTest(MentoringTest):
     def single_choice_question(self, number, mentoring, controls, choice_name, result, last=False):
 
         self.just_select_on_a_single_choice_question(
-                number, mentoring, controls, choice_name, last)
+            number, mentoring, controls, choice_name, last)
 
         controls.submit.click()
 
         self.wait_for_and_check_single_choice_question_result(
-                mentoring, controls, result, last)
+            mentoring, controls, result, last)
 
 
     def answer_mcq(self, number, name, value, mentoring, controls, is_last=False):
@@ -226,10 +222,10 @@ class MentoringAssessmentBaseTest(MentoringTest):
             "5 - Extremely good": False,
             "I don't want to rate it": False,
         }
-        self.assertEquals(choices.state, expected_choices)
+        self.assertEqual(choices.state, expected_choices)
         choices.select(choice_name)
         expected_choices[choice_name] = True
-        self.assertEquals(choices.state, expected_choices)
+        self.assertEqual(choices.state, expected_choices)
 
         self.ending_controls(controls, last)
 
@@ -268,13 +264,13 @@ class MentoringAssessmentBaseTest(MentoringTest):
             "Its gracefulness": False,
             "Its bugs": False,
         }
-        self.assertEquals(choices.state, expected_choices)
+        self.assertEqual(choices.state, expected_choices)
 
         for name in choice_names:
             choices.select(name)
             expected_choices[name] = True
 
-        self.assertEquals(choices.state, expected_choices)
+        self.assertEqual(choices.state, expected_choices)
 
         self.selected_controls(controls, last)
 
@@ -365,24 +361,24 @@ class MentoringAssessmentTest(MentoringAssessmentBaseTest):
         self.multiple_response_question(4, mentoring, controls, ("Its beauty",), PARTIAL, last=True)
 
         expected_results = {
-                "correct": 2, "partial": 1, "incorrect": 1, "percentage": 63,
-                "num_attempts": 1, "max_attempts": 2}
+            "correct": 2, "partial": 1, "incorrect": 1, "percentage": 62,
+            "num_attempts": 1, "max_attempts": 2}
         self.peek_at_review(mentoring, controls, expected_results, extended_feedback=extended_feedback)
         self.assert_messages_text(mentoring, "Assessment additional feedback message text")
         self.assert_clickable(controls.try_again)
         controls.try_again.click()
 
         self.freeform_answer(1, mentoring, controls, 'This is a different answer', CORRECT,
-                saved_value='This is the answer')
+                             saved_value='This is the answer')
         self.single_choice_question(2, mentoring, controls, 'Yes', CORRECT)
         self.rating_question(3, mentoring, controls, "1 - Not good at all", INCORRECT)
 
-        user_selection =  ("Its elegance", "Its beauty", "Its gracefulness")
+        user_selection = ("Its elegance", "Its beauty", "Its gracefulness")
         self.multiple_response_question(4, mentoring, controls, user_selection, CORRECT, last=True)
 
         expected_results = {
-                "correct": 3, "partial": 0, "incorrect": 1, "percentage": 75,
-                "num_attempts": 2, "max_attempts": 2}
+            "correct": 3, "partial": 0, "incorrect": 1, "percentage": 75,
+            "num_attempts": 2, "max_attempts": 2}
         self.peek_at_review(mentoring, controls, expected_results, extended_feedback=extended_feedback)
         self.assert_disabled(controls.try_again)
         self.assert_messages_empty(mentoring)
@@ -418,13 +414,13 @@ class MentoringAssessmentTest(MentoringAssessmentBaseTest):
         mentoring, controls = self.go_to_assessment()
 
         self.just_select_on_a_single_choice_question(
-                0, mentoring, controls, "Yes", True)
+            0, mentoring, controls, "Yes", True)
 
         controls.submit.click()
         controls.submit.click()
 
         self.wait_for_and_check_single_choice_question_result(
-                mentoring, controls, CORRECT, True)
+            mentoring, controls, CORRECT, True)
 
     def test_unblock_submit_on_error(self):
         """
@@ -435,7 +431,7 @@ class MentoringAssessmentTest(MentoringAssessmentBaseTest):
         mentoring, controls = self.go_to_assessment()
 
         self.just_select_on_a_single_choice_question(
-                0, mentoring, controls, "Yes", True)
+            0, mentoring, controls, "Yes", True)
         self.timeout = 20
         with self.settings(ROOT_URLCONF='integration.urls_for_reenable_submit_test'):
             controls.submit.click()
@@ -452,7 +448,7 @@ class MentoringAssessmentTest(MentoringAssessmentBaseTest):
         mentoring, controls = self.go_to_assessment()
 
         self.just_select_on_a_single_choice_question(
-                0, mentoring, controls, "Maybe not", True)
+            0, mentoring, controls, "Maybe not", True)
 
         controls.submit.click()
         controls.submit.click()

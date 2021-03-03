@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -26,14 +25,12 @@
 import logging
 
 from lazy import lazy
-
 from xblock.fragment import Fragment
 
-from .light_children import LightChild, Boolean, Scope, String, Integer, Float
-from .step import StepMixin
+from .light_children import Boolean, Float, Integer, LightChild, Scope, String
 from .models import Answer
+from .step import StepMixin
 from .utils import loader
-
 
 # Globals ###########################################################
 
@@ -74,7 +71,7 @@ class AnswerBlock(LightChild, StepMixin):
         return block
 
     @lazy
-    def student_input(self):
+    def student_input(self):  # pylint: disable=E0202
         """
         Use lazy property instead of XBlock field, as __init__() doesn't support
         overwriting field values
@@ -119,7 +116,7 @@ class AnswerBlock(LightChild, StepMixin):
     def submit(self, submission):
         if not self.read_only:
             self.student_input = submission[0]['value'].strip()
-            log.info(u'Answer submitted for`{}`: "{}"'.format(self.name, self.student_input))
+            log.info('Answer submitted for`{}`: "{}"'.format(self.name, self.student_input))
         return self.calculate_results()
 
     def get_results(self, previous_result):
@@ -146,7 +143,7 @@ class AnswerBlock(LightChild, StepMixin):
         """
         Replicate data changes on the related Django model used for sharing of data accross XBlocks
         """
-        super(AnswerBlock, self).save()
+        super().save()
 
         # Only attempt to locate a model object for this block when the answer has a name
         if self.name:
@@ -170,7 +167,7 @@ class AnswerBlock(LightChild, StepMixin):
         student_id = self.xmodule_runtime.anonymous_student_id
         course_id = self.xmodule_runtime.course_id
 
-        answer_data, created = Answer.objects.get_or_create(
+        answer_data, _ = Answer.objects.get_or_create(
             student_id=student_id,
             course_id=course_id,
             name=name,

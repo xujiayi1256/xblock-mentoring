@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -25,16 +24,15 @@
 
 import logging
 import uuid
-from lazy import lazy
 
+from lazy import lazy
 from xblock.fragment import Fragment
 
 from .choice import ChoiceBlock
+from .light_children import Boolean, Float, LightChild, Scope, String
 from .step import StepMixin
-from .light_children import LightChild, Scope, String, Float, Boolean
 from .tip import TipBlock
-from .utils import loader, ContextConstants
-
+from .utils import ContextConstants, loader
 
 # Globals ###########################################################
 
@@ -81,7 +79,7 @@ class QuestionnaireAbstractBlock(LightChild, StepMixin):
         as_template = context.get(ContextConstants.AS_TEMPLATE, True) if context is not None else True
 
         if str(self.type) not in self.valid_types:
-            raise ValueError(u'Invalid value for {}.type: `{}`'.format(name, self.type))
+            raise ValueError('Invalid value for {}.type: `{}`'.format(name, self.type))
 
         template_path = 'templates/html/{}_{}.html'.format(name.lower(), self.type)
 

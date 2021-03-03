@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -25,8 +24,8 @@
 
 from django.db import models
 
-
 # Classes ###########################################################
+
 
 class Answer(models.Model):
     """
@@ -45,10 +44,10 @@ class Answer(models.Model):
     created_on = models.DateTimeField('created on', auto_now_add=True)
     modified_on = models.DateTimeField('modified on', auto_now=True)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         # Force validation of max_length
         self.full_clean()
-        super(Answer, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class LightChild(models.Model):

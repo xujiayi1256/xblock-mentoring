@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -23,8 +22,10 @@
 #
 
 import logging
+
 from lxml import etree
 from xblock.fragment import Fragment
+
 from .light_children import LightChild, Scope, String
 
 log = logging.getLogger(__name__)
@@ -42,13 +43,13 @@ class SharedHeaderBlock(LightChild):
         block.light_children = []
 
         node.tag = 'div'
-        block.content = unicode(etree.tostring(node))
+        block.content = etree.tostring(node, encoding='unicode')
         node.tag = 'shared-header'
 
         return block
 
     def student_view(self, context=None):
-        return Fragment(u"<script type='text/template' id='light-child-template'>\n{}\n</script>".format(
+        return Fragment("<script type='text/template' id='light-child-template'>\n{}\n</script>".format(
             self.content
         ))
 

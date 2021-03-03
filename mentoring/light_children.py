@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -23,34 +22,28 @@
 
 # Imports ###########################################################
 
-import logging
 import json
-
-from lazy import lazy
+import logging
+from io import StringIO
 from weakref import WeakKeyDictionary
 
-from StringIO import StringIO
+from django.urls import reverse
+from lazy import lazy
 from lxml import etree
-
-from django.core.urlresolvers import reverse
-
 from xblock.core import XBlock
 from xblock.fragment import Fragment
 from xblock.plugin import Plugin
-
 from xblockutils.publish_event import PublishEventMixin
 
 from .models import LightChild as LightChildModel
-
+from .utils import XBlockWithChildrenFragmentsMixin
 
 try:
-    from xmodule_modifiers import replace_jump_to_id_urls
-except:
+    from xmodule_modifiers import replace_jump_to_id_urls  # pylint: disable=import-error
+except Exception:
     # TODO-WORKBENCH-WORKAROUND: To allow to load from the workbench
     def replace_jump_to_id_urls(a, b, c, d, frag, f):
         return frag
-
-from .utils import XBlockWithChildrenFragmentsMixin
 
 
 # Globals ###########################################################
@@ -96,7 +89,7 @@ class LightChildrenMixin(XBlockWithChildrenFragmentsMixin):
         xml_content = getattr(block, 'xml_content', None)
 
         if is_default(xml_content):
-            block.xml_content = etree.tostring(node)
+            block.xml_content = etree.tostring(node, encoding='unicode')
 
         return block
 
@@ -124,7 +117,7 @@ class LightChildrenMixin(XBlockWithChildrenFragmentsMixin):
         # Instantiate child
         child_class = cls.get_class_by_element(xml_child.tag)
         child = child_class(block)
-        child.name = u'{}_{}'.format(block.name, child_id)
+        child.name = '{}_{}'.format(block.name, child_id)
 
         # Add any children the child may itself have
         child_class.init_block_from_node(child, xml_child, xml_child.items())
@@ -167,7 +160,7 @@ class LightChildrenMixin(XBlockWithChildrenFragmentsMixin):
         """
 
         frag = getattr(child, view_name)(context)
-        frag.content = u'<div class="xblock-light-child" name="{}" data-type="{}" data-step="{}">{}</div>'.format(
+        frag.content = '<div class="xblock-light-child" name="{}" data-type="{}" data-step="{}">{}</div>'.format(
             child.name, child.__class__.__name__, getattr(child, 'step_number', ''), frag.content)
         return frag
 
@@ -191,7 +184,7 @@ class XBlockWithLightChildren(LightChildrenMixin, XBlock, PublishEventMixin):
     XBlock base class with support for LightChild
     """
     def __init__(self, *args, **kwargs):
-        super(XBlockWithLightChildren, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.xblock_container = self
         self.load_children_from_xml_content()
 
@@ -221,7 +214,7 @@ class XBlockWithLightChildren(LightChildrenMixin, XBlock, PublishEventMixin):
 
         try:
             jump_to_url = reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
-        except:
+        except Exception:
             # TODO-WORKBENCH-WORKAROUND: To allow to load from the workbench
             jump_to_url = '/jump_to_id'
 
@@ -256,14 +249,14 @@ class LightChild(Plugin, LightChildrenMixin):
             xmodule_runtime = self.parent.xmodule_runtime
         except AttributeError:
             # TODO-WORKBENCH-WORKAROUND: To allow to load from the workbench
-            class xmodule_runtime(object):
+            class xmodule_runtime:
                 course_id = 'sample-course'
                 anonymous_student_id = 'student1'
             xmodule_runtime = xmodule_runtime()
         return xmodule_runtime
 
     @lazy
-    def student_data(self):
+    def student_data(self):  # pylint: disable=method-hidden
         """
         Use lazy property instead of XBlock field, as __init__() doesn't support
         overwriting field values
@@ -334,9 +327,9 @@ class LightChild(Plugin, LightChildrenMixin):
 
         student_id = self.xmodule_runtime.anonymous_student_id
         course_id = self.xmodule_runtime.course_id
-        url_name = "%s-%s" % (self.xblock_container.url_name, name)
+        url_name = "{}-{}".format(self.xblock_container.url_name, name)
 
-        lightchild_data, created = LightChildModel.objects.get_or_create(
+        lightchild_data, _ = LightChildModel.objects.get_or_create(
             student_id=student_id,
             course_id=course_id,
             name=url_name,
@@ -347,7 +340,7 @@ class LightChild(Plugin, LightChildrenMixin):
         return self.runtime.local_resource_url(block, uri, block_type=self.block_type)
 
 
-class LightChildField(object):
+class LightChildField:
     """
     Fake field with no persistence - allows to keep XBlocks fields definitions on LightChild
     """
@@ -369,7 +362,7 @@ class LightChildField(object):
 
 class String(LightChildField):
     def __init__(self, *args, **kwargs):
-        super(String, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.default = kwargs.get('default', '') or ''
 
 #    def split(self, *args, **kwargs):
@@ -378,7 +371,7 @@ class String(LightChildField):
 
 class Integer(LightChildField):
     def __init__(self, *args, **kwargs):
-        super(Integer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.default = kwargs.get('default', 0)
 
     def __set__(self, instance, value):
@@ -390,11 +383,11 @@ class Integer(LightChildField):
 
 class Boolean(LightChildField):
     def __init__(self, *args, **kwargs):
-        super(Boolean, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.default = kwargs.get('default', False)
 
     def __set__(self, instance, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             value = value.lower() == 'true'
 
         self.data[instance] = value
@@ -402,7 +395,7 @@ class Boolean(LightChildField):
 
 class Float(LightChildField):
     def __init__(self, *args, **kwargs):
-        super(Float, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.default = kwargs.get('default', 0)
 
     def __set__(self, instance, value):
@@ -414,10 +407,10 @@ class Float(LightChildField):
 
 class List(LightChildField):
     def __init__(self, *args, **kwargs):
-        super(List, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.default = kwargs.get('default', [])
 
 
-class Scope(object):
+class Scope:
     content = None
     user_state = None

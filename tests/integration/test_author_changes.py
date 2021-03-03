@@ -3,10 +3,13 @@ If an author makes changes to the block after students have started using it, wi
 happen?
 """
 
-from .base_test import MentoringTest
-import ddt
-from .test_assessment import MentoringAssessmentBaseTest
 import re
+
+import ddt
+
+from .base_test import MentoringTest
+from .test_assessment import MentoringAssessmentBaseTest
+
 
 class AuthorChangesTest(MentoringTest):
     """

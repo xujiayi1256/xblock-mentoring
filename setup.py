@@ -43,36 +43,36 @@ def package_data(pkg, root_list):
 # Main ##############################################################
 
 BLOCKS = [
-    'mentoring = mentoring:MentoringBlock',
-    'mentoring-dataexport = mentoring:MentoringDataExportBlock',
+    'mentoring = mentoring.mentoring:MentoringBlock',
+    'mentoring-dataexport = mentoring.dataexport:MentoringDataExportBlock',
 ]
 
 BLOCKS_CHILDREN = [
-    'mentoring-table = mentoring:MentoringTableBlock',
-    'column = mentoring:MentoringTableColumnBlock',
-    'header = mentoring:MentoringTableColumnHeaderBlock',
-    'answer = mentoring:AnswerBlock',
-    'quizz = mentoring:MCQBlock',
-    'mcq = mentoring:MCQBlock',
-    'mrq = mentoring:MRQBlock',
-    'message = mentoring:MentoringMessageBlock',
-    'tip = mentoring:TipBlock',
-    'choice = mentoring:ChoiceBlock',
-    'html = mentoring:HTMLBlock',
-    'title = mentoring:TitleBlock',
-    'shared-header = mentoring:SharedHeaderBlock',
+    'mentoring-table = mentoring.table:MentoringTableBlock',
+    'column = mentoring.table:MentoringTableColumnBlock',
+    'header = mentoring.table:MentoringTableColumnHeaderBlock',
+    'answer = mentoring.answer:AnswerBlock',
+    'quizz = mentoring.mcq:MCQBlock',
+    'mcq = mentoring.mcq:MCQBlock',
+    'mrq = mentoring.mrq:MRQBlock',
+    'message = mentoring.message:MentoringMessageBlock',
+    'tip = mentoring.tip:TipBlock',
+    'choice = mentoring.choice:ChoiceBlock',
+    'html = mentoring.html:HTMLBlock',
+    'title = mentoring.title:TitleBlock',
+    'shared-header = mentoring.header:SharedHeaderBlock',
 ]
 
 setup(
     name='xblock-mentoring',
-    version='0.2',
+    version='1.0',
     description='XBlock - Mentoring',
     packages=['mentoring', 'mentoring.migrations'],
     install_requires=[
-        'XBlock',
-        'xblock-utils',
+        'unicodecsv',
+        'XBlock>=1.3',
+        'xblock-utils>=2.1',
     ],
-    dependency_links = ['http://github.com/edx-solutions/xblock-utils/tarball/master#egg=xblock-utils'],
     entry_points={
         'xblock.v1': BLOCKS,
         'xblock.light_children': BLOCKS_CHILDREN,

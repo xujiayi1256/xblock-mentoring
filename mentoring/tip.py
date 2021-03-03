@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2014 Harvard
 #
@@ -26,8 +25,7 @@
 import logging
 
 from .light_children import LightChild, Scope, String
-from .utils import loader, ContextConstants
-
+from .utils import ContextConstants, loader
 
 # Globals ###########################################################
 
