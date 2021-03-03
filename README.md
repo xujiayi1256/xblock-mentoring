@@ -1,6 +1,8 @@
 Mentoring XBlock
 ----------------
 
+## Notice: This repo will be archived in April 2021. 
+
 This XBlock allows to automate the workflow of real-life mentoring,
 within an edX course.
 
