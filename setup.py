@@ -72,7 +72,7 @@ setup(
         'XBlock',
         'xblock-utils',
     ],
-    dependency_links = ['http://github.com/edx-solutions/xblock-utils/tarball/master#egg=xblock-utils'],
+    dependency_links = ['git+https://github.com/Learningtribes/xblock-utils.git@hawthorn#egg=xblock-utils'],
     entry_points={
         'xblock.v1': BLOCKS,
         'xblock.light_children': BLOCKS_CHILDREN,
